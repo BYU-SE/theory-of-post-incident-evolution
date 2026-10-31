@@ -1,0 +1,87 @@
+#
+# 53.yaml | Google
+# http://googleblog.blogspot.com/2014/01/todays-outage-for-several-google.html
+#
+# An automated configuration generation system produced a bad configuration causing downtime to many systems, and then automatically cleared the defect and produced a good configuration 12 minutes later, causing the system to automatically recover
+#
+
+AI-1:
+  # At 10:55 a.m. PST this morning, an internal system that generates configurations—essentially, information that tells other systems how to behave—encountered a software bug and generated an incorrect configuration. [.. We will be ] Correcting the bug in the configuration generator to prevent recurrence [... continued below ...]
+
+  experience: The configuration generation system generated an incorrect configuration
+  action: Correct bug and audit similar systems
+  target: Control service for generating configuration (single)
+  goal: Prevent recurrence
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # [... continued from above ...] and auditing all other critical configuration generation systems to ensure they do not contain a similar bug.
+
+  experience: The configuration generation system generated an incorrect configuration
+  action: Correct bug and audit similar systems
+  target: Control service for generating configuration (many)
+  goal: Prevent recurrence
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / subtract
+    - formative / check
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-3:
+  # Adding additional input validation checks for configurations, so that a bad configuration generated in the future will not result in service disruption.
+
+  experience: The configuration generation system generated an incorrect configuration, which was used without any input validation
+  action: Add input validation checks
+  target: Service using generated configuration
+  goal: Prevent bad configurations from causing service disruption
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Safety / Operational constraint
+    - Reliability / Availability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # Adding additional targeted monitoring to more quickly detect and diagnose the cause of service failure.
+
+  experience: Monitoring detected issue (7 minutes late) but did not help responders diagnose (22 minutes later still diagnosing)
+  action: Add targeted monitoring
+  target: Metrics reporting (for multiple systems)
+  goal: More quickly detect and diagnose the failure
+
+  lifecycle:
+    - Response / Detection
+    - Response / Diagnosis
+  action-type: evo / add
+  sts: UNCLEAR
+  google-ai:
+    - detect / mitigate
+    - mitigate future
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

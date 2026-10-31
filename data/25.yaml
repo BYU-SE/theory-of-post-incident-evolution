@@ -1,0 +1,181 @@
+#
+# 25.yaml | AWS
+# https://aws.amazon.com/message/11201/
+#
+# New servers were added to the front-end fleet in one region causing "all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration."
+#
+
+AI-1:
+  # In the very short term, we will be moving to larger CPU and memory servers, reducing the total number of servers and, hence, threads required by each server to communicate across the fleet. This will provide significant headroom in thread count used as the total threads each server must maintain is directly proportional to the number of servers in the fleet. Having fewer servers means that each server maintains fewer threads.
+
+  experience: A small capacity addition to cluster led to servers exceeding the amount of threads allowed by the OS, since each server gets its own thread
+  action: Move to larger (CPU and memory) and (so) fewer servers
+  target: Fleet hardware and VMs (front-end service)
+  goal: Avoid hitting per server thread limits (while serving same load)
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent #/ reduce resource requirements (threads)
+  intended-effect: Performance Efficiency / Capacity (safety margin)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # We are adding fine-grained alarming for thread consumption in the service.
+
+  experience: The diagnosis work was slowed by the variety of errors observed. They were seeing errors in all aspects of the various calls being made by existing and new members of the front-end fleet, exacerbating their ability to separate side-effects from the root cause.
+  action: Add more specific or "fine-grained alarming" (thread utilization)
+  target: Metrics reporting and monitoring
+  goal: Notify about thread exhaustion (clearly and timely)
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future #/ monitoring (more fine-grained)
+  intended-effect: Safety / Hazard warning
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # [During the incident, they] didn’t want to increase the operating system limit without further testing [so post incident they will] finish testing an increase in thread count limits in our operating system configuration, which we believe will give us significantly more threads per server and give us significant additional safety margin there as well.
+
+  experience: They reached the OS threads limit and didn't want to increase the limit without further testing
+  action: Test system with increased OS thread limit
+  target: Operating system configuration for servers in fleet
+  goal: Increase available threads and provide additional "safety margin"
+
+  lifecycle: Response / Mitigation
+  action-type: formative / check # test
+  sts: Tech / Infra
+  google-ai: prevent #/ add headroom (thread limit)
+  intended-effect: Performance Efficiency / Capacity (safety margin)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # [During the incident, they] didn’t want to increase the operating system limit without further testing [so post incident they will] finish testing an increase in thread count limits in our operating system configuration, which we believe will give us significantly more threads per server and give us significant additional safety margin there as well.
+
+  experience: They reached the OS threads limit and didn't want to increase the limit without further testing
+  action: Increase configuration to allow more threads
+  target: Operating system configuration for servers in fleet
+  goal: Increase available threads and provide additional "safety margin"
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent #/ add headroom (thread limit)
+  intended-effect: Performance Efficiency / Capacity (safety margin)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-5:
+  # The front-end fleet is composed of many thousands of servers, and for the reasons described earlier, we could only add servers at the rate of a few hundred per hour [...] In addition, we are making a number of changes to radically improve the cold-start time for the front-end fleet [...] We are moving the front-end server cache to a dedicated fleet.
+
+  experience: The recovery rate of the front-end fleet was limited due to contention between populating information and serving incoming requests, requiring a slow and careful restart
+  action: Add dedicated cache fleet (separate service into two fleets)
+  target: Cache fleet (new) & (previously) collocated service
+  goal: Reduce restart time (by making servers stateless)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: mitigate future #/ speedup cold-start
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-6:
+  # In addition, we are making a number of changes to radically improve the cold-start time for the front-end fleet [...] We will also move a few large AWS services, like CloudWatch, to a separate, partitioned front-end fleet.
+
+  experience: The recovery rate of the front-end fleet was limited due to contention between populating information and serving incoming requests, requiring a slow and careful restart. Related to the populating information, the failure also showed how clients all fail together due to the architecture.
+  action: Partition service (and move large client load)
+  target: Kinesis front-end service and fleet partitioning (for large clients)
+  goal: UNKNOWN (likely headroom or isolation)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-7:
+  # In the medium term, we will greatly accelerate the cellularization of the front-end fleet to match what we've done with the back-end [...] Cellularization is an approach we use to isolate the effects of failure within a service, and to keep the components of the service (in this case, the shard-map cache) operating within a previously tested and operated range. This had been under way for the front-end fleet in Kinesis, but unfortunately the work is significant and had not yet been completed. In addition to allowing us to operate the front-end in a consistent and well-tested range of total threads consumed, cellularization will provide better protection against any future unknown scaling limit.
+
+  experience: There was no isolation between front end services and servers, and an unknown scaling limit (the OS threads limit) occurred leading to broad outage.
+  action: Cellularize (dividing architecture into cells)
+  target: Front-end component (inc cache) cells
+  goal: Isolate failure effects and protect against unknown scaling limits
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / subtract # remove design vulnerability
+  sts: Tech / Core
+  google-ai: prevent 
+  intended-effect:
+    - Reliability / Fault tolerance (split for cellularization & isolation to limit impact)
+    - Flexibility / Scalability (limit at scale)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-9:
+  # There were a number of services that use Kinesis that were impacted as well [...] the prolonged issue with Kinesis Data Streams triggered a latent bug in [the] buffering code that caused the Cognito webservers to begin to block on the backlogged Kinesis Data Stream buffers [causing] elevated API failures and increased latencies [so] to prevent a recurrence of this issue, we have modified the Cognito webservers so that they can sustain Kinesis API errors without exhausting their buffers that resulted in these user errors.
+
+  experience: A latent defect in buffering caused blocking due to the duration of the downtime
+  action: Fix error handling in buffering code when dependency fails
+  target: Stream buffers (buffering on sends to dep)
+  goal: Tolerate sustained unavailability of dependency
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / UNCLEAR
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Fault tolerance (to hard dep failure)
+    - Reliability / Faultlessness
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability 
+
+AI-10:
+  # There were a number of services that use Kinesis that were impacted as well [...] While CloudWatch currently relies on Kinesis for its complete metrics and logging capabilities, the CloudWatch team is making a change to persist 3-hours of metric data in the CloudWatch local metrics data store. This change will allow CloudWatch users, and services requiring CloudWatch metrics (including AutoScaling), to access these recent metrics directly from the CloudWatch local metrics data store. This change has been completed in the US-EAST-1 Region and will be deployed globally in the coming weeks.
+
+  experience: CloudWatch relies on Kinesis for complete metrics and logging, and when Kinesis was struggling some metrics were dropped
+  action: Add local cache to store metrics (3 hours worth)
+  target: Local metrics data store (cache of data pushed to dep)
+  goal: Tolerate extended downtime of dependency (for key functionality)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add # caching
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: consequence 
+  matrix-approach: capability 
+
+AI-11:
+  # Outside of the service issues, we experienced some delays in communicating service status to customers during the early part of this event. We have two ways of communicating [...] While this worked as expected, we encountered several delays during the earlier part of the event in posting to the Service Health Dashboard with this tool, as it is a more manual and less familiar tool for our support operators [...] Going forward, we have changed our support training to ensure that our support engineers are regularly trained on the backup tool for posting to the Service Health Dashboard.
+
+  experience: There were delays communicating since their normal tool (Cognito) was impacted and the backup tool was more manual and less familiar
+  action: Change support engineer training (cover backup tools)
+  target: Customer communication by support engineers
+  goal: Quicker customer status updates during incident (affecting tooling)
+
+  lifecycle: Response / Customer communication
+  action-type: evo / add
+  sts: Process / Incident response training
+  google-ai: mitigate future #/ improve incident response (communication)
+  intended-effect: Interaction Capability / Operability (expertise with tool)
+
+  matrix-influence: consequence 
+  matrix-approach: capability 
+

@@ -1,0 +1,232 @@
+#
+# 23.yaml | AWS
+# https://aws.amazon.com/message/67457/
+#
+# The event was triggered during a large scale electrical storm which swept through the Northern Virginia area. We regret the problems experienced by customers affected by the disruption and, in addition to giving more detail, also wanted to provide information on actions we’ll be taking to mitigate these issues in the future.
+#
+
+AI-1:
+  # The [power generators, etc] will be repaired, recertified by the manufacturer, and retested at full load onsite or it will be replaced entirely
+
+  experience: Backup power generators failed (slow to stabilize voltage) after large voltage spike triggered switch
+  action: Repair, re-certify and test, or replace
+  target: Data center power generators (backup)
+  goal: Avoid power disruption
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract # fix or replace
+  sts: Infrastructure / Data center power systems
+  google-ai: prevent
+  intended-effect:
+    - Safety / Fail safe
+    - Reliability / Faultlessness (trust that it is)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-2:
+  # we will lengthen the amount of time the electrical switching equipment gives the generators to reach stable power before the switch board assesses whether the generators are ready to accept the full power load
+
+  experience: Backup power generators failed (slow to stabilize voltage) after large voltage spike triggered switch and automated failover didn't happen as expected
+  action: Extend time for before switching power supply
+  target: Data center power switching equipment
+  goal: Avoid power disruption (prevent customer impact)
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Infrastructure / Data center power systems
+  google-ai: prevent
+  intended-effect: Safety / Fail safe (caution)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-3:
+  # we will expand the power quality tolerances allowed when evaluating whether to switch the load to generator power.
+
+  experience: Backup power generators failed (slow to stabilize voltage) after large voltage spike triggered switch and automated failover didn't happen as expected
+  action: Expand range of allowed power quality
+  target: Data center power switching equipment
+  goal: Avoid power disruption
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Infrastructure / Data center power systems
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (behavioral change criteria)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-4:
+  # We will expand the size of the onsite 24x7 engineering staff to ensure that if there is a repeat event, the switch to generator will be completed manually (if necessary) before UPSs discharge and there is any customer impact.
+
+  experience: Backup power generators failed (slow to stabilize voltage) after large voltage spike triggered switch and automated failover didn't happen as expected. Staff had to manually stabilize the generators and swap power
+  action: Add personnel 
+  target: Onsite support team
+  goal: Allow for manual prevention (switching power supply)
+
+  lifecycle: Response / Mitigation # (before customer impact)
+  action-type: evo / add
+  sts: People / Organizational structure (support)
+  google-ai: prevent # "before customer impact"
+  intended-effect:
+    - Safety / Operational constraint (manually preempt)
+    - Reliability / Availability
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CHANGED
+
+AI-5:
+  # The vast majority of these instances came back online between 11:15pm PDT and just after midnight. Time for the completion of this recovery was extended by a bottleneck in our server booting process. Removing this bottleneck is one of the actions we’ll take to improve recovery times in the face of power failure.
+
+  experience: Completion of instance recovery was extended by a bottleneck in the boot process
+  action: Remove bottleneck (VAGUE)
+  target: Fleet instance booting process
+  goal: Improve recovery time (from power failure)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / subtract 
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Performance Efficiency / Time behavior (bottleneck)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-6:
+  # the number of volumes requiring processing was large enough that it still took several hours to complete the backlog [...] We have identified several areas in the recovery process that we will further optimize to improve the speed of processing recovered volumes
+
+  experience: There was a large backlog of volumes needing processing (for recovery), which took a long time to process
+  action: Optimize recovery process (VAGUE)
+  target: Storage recovery process (EBS volume backlogs)
+  goal: Improve speed of recovery
+
+  lifecycle: Failure / Recovery
+  action-type: evo / alter / strengthen # optimize
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Performance Efficiency / Time behavior (speed at scale)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-7:
+  # To protect against datastore corruption, currently when the primary copy loses power, the system automatically flips to a read-only mode in the other Availability Zones until power is restored to the affected Availability Zone or until we determine it is safe to promote another copy to primary. We are addressing the sources of blockage which forced manual assessment and required hand-managed failover for the control plane, and have work already underway to have this flip happen automatically
+
+  experience: Fail safe mode forced manual recovery
+  action: Automate failover process (removing manual steps)
+  target: Datastore failover (control plane for EBS)
+  goal: Safely increase recovery speed of volumes (flip automatically)
+
+  lifecycle:
+    - Failure / Recovery
+    - Response / Mitigation
+  action-type: evo / alter / weaken # fixes to support automation
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability (manual assessment and failover)
+    - Performance Efficiency / Time behavior (automation speed)
+
+  matrix-influence: consequence # CONFIRMED 
+  matrix-approach: vulnerability # CONFIRMED
+
+AI-8:
+  # [Shared queue backlog] delayed recovery for many customers [...] As a result of these impacts and our learning from them, we are breaking ELB processing into multiple queues to improve overall throughput and to allow more rapid processing of time-sensitive actions such as traffic shifts.
+
+  experience: Shared queue design (no priority) used in control plane fell behind with backlog (from bug and customers) and prevented customers from launching new instances in other zones
+  action: Break processing into multiple queues 
+  target: Shared queue processing load balancer control ops
+  goal: Increase throughput (speed up recovery)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken # fixing design
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Performance Efficiency / Time behavior (throughput and rapid)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-9:
+  # We are also going to immediately develop a backup DNS re-weighting that can very quickly shift all ELB traffic away from an impacted Availability Zone without contacting the control plane.
+
+  experience: Some clients did not shift traffic automatically even when given multiple IPs, and therefore were down while the impacted availability zone was down
+  action: Add backup system (or algorithm)
+  target: Network DNS system and logic (for ELB)
+  goal: Quickly shift traffic (bypassing control plane)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Safety / Fail safe
+    - Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-10:
+  # There were many remaining instances which required EBS to recover storage volumes [...] In addition to the actions noted above with EBS, RDS will be working to improve the speed at which volumes available for recovery can be processed.
+
+  experience: Shared queue design (no priority) used in control plane fell behind with backlog (from bug and customers) and prevented customers from launching new instances in other zones
+  action: Improve recovery processing (VAGUE)
+  target: Database recovery process (RDS volumes)
+  goal: Speed up recovery at scale
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen # speed up
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Performance Efficiency / Time behavior (at scale)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-11:
+  # However, a small number of Multi-AZ RDS instances did not complete failover, due to a software bug. The bug was introduced in April when we made changes to the way we handle storage failure [...] To address the issues we had with some Multi-AZ RDS Instances failovers, we have a mitigation for the bug in test and will be rolling it out in production in the coming weeks
+
+  experience: A defect meant that failover did not complete automatically
+  action: Mitigate a bug; test and deploy
+  target: Database failover (multi-AZ RDS instances)
+  goal: Speed automatic recovery (fix failover defect)
+
+  lifecycle: Failure / Downstream Effects
+    # - Pre-incident # [TODO] Defect is activated, different from introduced.
+  action-type: evo / alter / weaken # mitigation not fix
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: 
+    - Reliability / Faultlessness
+    - Reliability / Recoverability # I'm not sure this is right? How do we categorize failover?
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: vulnerability # CONFIRMED
+
+AI-12:
+  # We will spend many hours over the coming days and weeks improving our understanding of the details of the various parts of this event and determining how to make further changes to improve our services and processes.
+
+  experience: UNCLEAR
+  action: Learn more about incident and plan more AIs
+  target: services and processes (VAGUE)
+  goal: Improve services and processes
+
+  action-type: formative / investigative
+  sts:
+    - Process / UNCLEAR
+    - Tech / Core
+  google-ai: investigate
+
+  matrix-influence: unspecified # CHANGED
+  matrix-approach: unspecified # CHANGED
+

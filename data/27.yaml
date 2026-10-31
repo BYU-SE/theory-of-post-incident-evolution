@@ -1,0 +1,24 @@
+#
+# 27.yaml | NRE Labs
+# https://keepingitclassless.net/2018/12/december-4-nre-labs-outage-post-mortem/
+#
+# NRE Labs goes offline due to a failing liveness probe taking down the cluster every 2 minutes
+#
+
+AI-1:
+  # We need a “down for maintenance” page that directs to twitter for updates. Not failing “halfway”, and leaving folks guessing what went wrong. For those of you that sent direct messages asking about this, I apologize. We should do better with this, and will look into running a basic maintenance page in Google Cloud Functions we can redirect to when things like this happen, planned or unplanned.
+
+  experience: They were missing mechanism for customer communication and so customers were messaging the responder directly
+  action: Create "down for maintenance" page for redirect under duress
+  target: Status Page (down for maintenance)
+  goal: Fail fully (not halfway) and clearly communicate unavailability
+
+  lifecycle: Response / Customer communication
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future #/ improve response 
+  intended-effect: Interaction Capability / User assistance (status transparency)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

@@ -1,0 +1,86 @@
+#
+# 65.yaml | AWS
+# http://blog.travis-ci.com/2018-01-31-build-outage-postmortem
+# https://web.archive.org/web/20221225015813/blog.travis-ci.com/2018-01-31-build-outage-postmortem
+#
+
+AI-1: 
+  #  We have applied queue policies in RabbitMQ to make it far less likely that a backlog of the kind that started this incident results in an extended queue publishing halt and the consequent cascading failure that we experienced here.
+
+  experience: Worker process malfunctioned (grows in memory) causing queue processing to fall behind. Queue rapidly exhausted memory and started paging messages to disk, which caused the rest of the incident.
+  action: Change queue policies
+  target: Message broker (RabbitMQ) configuration
+  goal: Prevent backlog, halts & cascading failures
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken # "far less likely"
+  sts: Tech / Core
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Fault tolerance
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-2:
+  # We are also investigating how to make the various systems that rely on RabbitMQ more tolerant of queue halts and general cluster availability problems.
+
+  experience: Queue processing halt caused issues in dependent services, even in other jobs on different queues
+  action: Investigate options for fault tolerance
+  target: Job execution systems with deps on message broker (RabbitMQ)
+  goal: Ensure that queue halts and other availability issues do not effect other systems
+
+  lifecycle: Failure / Downstream Effects
+  action-type: 
+    - formative / discover options
+    - evo / alter / weaken
+  sts: Tech / Support
+  intended-effect:
+    - Reliability / Fault tolerance
+    - Reliability / Availability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-3:
+  # We have identified a number of possible improvements to our monitoring systems which should make it easier for us to understand what is happening in our systems during cascading failure such as this one.
+
+  experience: Responders did not understand what was going on, and instead treated other symptoms. Eventually they requested help from their vendor.
+  action: Improvements for understanding cascading failures (VAGUE)
+  target: Monitoring for multiple systems (probably across cascade)
+  goal: Make it easier to understand what is happening during the incident
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / alter / strengthen
+  target-type: Monitoring and metrics
+  sts: Tech / Support 
+  intended-effect: Maintainability / Analysability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # Even before this incident, we had been investigating new approaches to dispatching builds to our infrastructure that would allow us to reduce our reliance on a highly-available RabbitMQ cluster and improve the overall resilience of Travis CI. This work will receive renewed attention in light of what we learned in this incident.
+
+  experience: Worker process malfunctioned (grows in memory) causing queue processing to fall behind. Queue rapidly exhausted memory and started paging messages to disk, which caused the rest of the incident.
+  action: Investigate new approaches to dispatching builds (VAGUE)
+  target: Job execution system & dependency on message broker (RabbitMQ)
+  goal: Reduce reliance on queue and improve overall resilience of the service
+
+  lifecycle:
+    - Failure / Inception
+  action-type:
+    - formative / discover options
+  sts:
+    - Tech / Core
+  intended-effect:
+    # improve the overall resilience
+    - Reliability / Fault tolerance
+  google-ai:
+    - prevent
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability

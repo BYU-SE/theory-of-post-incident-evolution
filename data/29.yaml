@@ -1,0 +1,82 @@
+#
+# 29.yaml | PythonAnywhere
+# https://blog.pythonanywhere.com/189/
+#
+# A critical storage volume failed. "It was caused by an extremely unlikely storage system failure, but despite that it should not have led to such a lengthy downtime, and should not have affected so many people."
+#
+#
+# - Added the wishy-washy AIs, as they are interesting. Actually, the most interesting thing is that even at the time the IR is published, they were unsure what AIs to do (and how). Apparently there are tradeoffs and difficulties with avoiding these kinds of incidents.
+
+AI-1:
+  # this outage affected pretty much everyone who uses our site at some point, and that is a problem. We need to work on ways to improve things so that if one file server fails, the effects are limited to people whose data is stored on that server [...] 
+
+  experience: Storage volume failure propagated to affect more than just the files on the volume, as multiple types of workers servicing all traffic and background processes were blocked
+  action: Find ways to improve handling of single server failure
+  target: Storage system (filesystem) and dependents
+  goal: Limit server failure impact to direct (data) dependents
+
+  lifecycle: Failure / Downstream Effects
+  action-type: formative / discover options
+  sts: UNCLEAR
+  google-ai: mitigate future #/ limit scope of impact
+  intended-effect: Reliability / Fault tolerance (limit impact)
+
+  matrix-influence: consequence 
+  matrix-approach: unspecified
+
+AI-2:
+  # Identifying the underlying cause of the problem. [...] We need to think hard to see if we can find a way to do this, however; while we don’t have the AWS team’s admin tools, we do have root access to the machine, so in theory there should be a way to find out if a particular volume is hanging.
+
+  experience: There were challenges to discovering the underlying cause of the problem, which was hardware-related
+  action: Find ways to determine state of storage volume
+  target: Storage tooling (diagnosing volumes from host)
+  goal: Speed up diagnosis of hung storage volume
+
+  lifecycle: Response / Diagnosis
+  action-type: 
+    - evo / add
+    - formative / discover options
+  sts: Tech / Support
+  google-ai: mitigate future #/ diagnosis (speed up)
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # Rebuilding a file server’s volumes from its backup server. In retrospect, we were right to do this rather than to promote the backup server to being the primary server. However, because we were putting scripts together (a combination of our normal backup scripts and the tools we use to recover backups when people accidentally delete files) in realtime, it took almost an hour. This is something we should have ready to go in a fully tested script so that we just need to run something like python3 replace_file_server_storage_with_backups.py livefile1
+
+  experience: They had to build recovery scripts on the fly to restore the volumes from the backup server which took an hour
+  action: Create and test script to automate storage volume rebuild from backup
+  target: Storage tooling (volume management scripts)
+  goal: Speed up storage volume rebuild (and make more reliable)
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future #/ recovery (speed up)
+  intended-effect:
+    - Reliability / Recoverability (automated)
+    - Interaction Capability / Operability (responder actions)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # Warming up the new volumes. This one’s pretty hard to sort out [...] One possibility would be to shut down the backup server, take the snapshots, but then put the old backup volumes on the file server, and start up the backup server with the unwarmed volumes that were created from the snapshots. That should mean that the file storage would be warmed up as soon as it came into use, and would just slow the initial sync between the servers down somewhat. We would need to test and profile that carefully before doing it, though. 
+
+  experience: New volumes copy over data upon read, which means that they start off quite slow.
+  action: Develop & test & profile alternative volume rebuild approaches
+  target: Storage backup & replacement procedures for volumes
+  goal: Speed up initialization of new storage volumes
+
+  lifecycle: Failure / Recovery
+  action-type: evo / alter / strengthen
+  sts: Process / Recovery process
+  google-ai: mitigate future #/ recovery # was slow even after rebuild
+  intended-effect: Reliability / Recoverability
+  target-sts: process
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

@@ -1,0 +1,47 @@
+#
+# 12.yaml | Instapaper
+# https://medium.com/making-instapaper/instapaper-outage-cause-recovery-3c32a7e9cc5f
+#
+# A critical RDS hosted MySQL database failed because a table exceeded the RDS instances 2TB file size limit (ext3 filesystem limit)
+#
+
+AI-1:
+  # After a long phone call with AWS support and discussing the limitation with Pinterest’s Site Reliability engineers, we understood [...] Pinterest SRE team guided us through [...] As part of our retrospective process at Pinterest, we’re defining a better workflow for system-wide Instapaper outages that escalate issues immediately to Pinterest’s Site Reliability Engineering team.
+
+  experience: They needed to engage experts from other teams to help respond. And there were delays in engaging the best responders
+  action: Change to direct (immediate) escalation
+  target: Alarming and paging (escalation)
+  goal: Engage experts more quickly (SREs)
+
+  lifecycle: Response / Triage
+  action-type: evo / alter / strengthen
+  sts: Process / Incident response / Workflow
+  google-ai: mitigate future #/ decrease duration
+  intended-effect:
+    - Reliability / Recoverability
+    - Interaction Capability / Operability (access to expertise & responsiveness during incident)
+
+  matrix-influence: consequence 
+  matrix-approach: capability
+
+AI-2:
+  # [Resolution involved multi-day database dump and rebuild because] MySQL instance failed with a critical filesystem issue that all of our backups were also subject to [...] Additionally, we’re going to be more aggressive with testing our MySQL backups. We used to test backups every three months, and now we’ll test every month.
+
+  experience: They did not have a disaster recovery plan for this event and restoring from a database was a painful process. # [TODO] Is this right?
+  action: Increase frequency of testing of backup (from quarterly to monthly)
+  target: Testing process for database backups
+  goal: Reliable backups for quicker recovery
+
+  lifecycle:
+    - Response / Mitigation # [TODO] Was this the human side of things or the system side?
+    - Failure / Recovery # [TODO] Was this the human side of things or the system side?
+  action-type: evo / alter / strengthen
+  sts: Process / Testing activities and practices # / Backup database testing
+  google-ai: mitigate future #/ decrease duration
+  intended-effect:
+    - Reliability / Recoverability ("help accelerate our response times")
+    - Reliability / Faultlessness (of backup process)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

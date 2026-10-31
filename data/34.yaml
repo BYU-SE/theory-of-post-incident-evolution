@@ -1,0 +1,58 @@
+#
+# 34.yaml | Cloudflare
+# https://blog.cloudflare.com/how-cloudflare-erroneously-throttled-a-customers-web-traffic/
+#
+# They incorrectly throttled a customers web traffic
+# 
+
+AI-1:
+  # A Cloudflare engineer decided to apply a throttling mechanism to prevent the zone from pulling so much traffic from their origin. Let's be very clear on this action: Cloudflare does not have an established process to throttle customers that consume large amounts of bandwidth, and does not intend to have one. This remediation was a mistake, it was not sanctioned, and we deeply regret it. To make sure a similar incident does not happen, we are establishing clear rules to mitigate issues like this one. Any action taken against a customer domain, paying or not, will require multiple levels of approval and clear communication to the customer.
+
+  experience: An engineer improperly applied a throttling mechanisms to an individual client which was causing network congestion
+  action: Establish rules of approval and communication to mitigate excessive usage
+  target: Incident response and mitigation runbooks and procedures
+  goal: Prevent future unsanctioned mitigation actions
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Process / Operational documentation (runbooks)
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # A Cloudflare engineer decided to apply a throttling mechanism to prevent the zone from pulling so much traffic from their origin. Let's be very clear on this action: Cloudflare does not have an established process to throttle customers that consume large amounts of bandwidth, and does not intend to have one. This remediation was a mistake, it was not sanctioned, and we deeply regret it. To make sure a similar incident does not happen, we are establishing clear rules to mitigate issues like this one. [.. AI-1 ..] Our tooling will be improved to reflect this. We have many ways of traffic shaping in situations where a huge spike of traffic affects a link and could have applied a different mitigation in this instance.
+
+  experience: An engineer improperly applied a throttling mechanisms to an individual client which was causing network congestion
+  action: Update tooling to reflect new rules of approval and communication for mitigation
+  target: Network throttling mechanisms
+  goal: Prevent future unsanctioned mitigation actions
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # We are in the process of rewriting our terms of service to better reflect the type of services that our customers deliver on our platform today. We are also committed to explaining to our users in plain language what is permitted under self-service plans. As a developer-first company with transparency as one of its core principles, we know we can do better here. We will follow up with a blog post dedicated to these changes later.
+
+  experience: An engineer improperly applied a throttling mechanisms to an individual client which was causing network congestion
+  action: Rewrite terms of service and announce over a blog post
+  target: Customer communication (terms of service document)
+  goal: Increase clarity of allowed usage
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Process / Terms of Service documents
+  google-ai: prevent
+  intended-effect: Interaction Capability / User assistance
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

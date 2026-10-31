@@ -1,0 +1,116 @@
+#
+# 14.yaml | GitHub
+# https://blog.github.com/2018-10-21-october21-incident-report/
+#
+# # URL of incident report
+# https://github.blog/2018-10-30-oct21-post-incident-analysis/
+#
+# Description: "At 22:52 UTC on October 21, routine maintenance work to replace failing 100G optical equipment resulted in the loss of connectivity between our US East Coast network hub and our primary US East Coast data center. Connectivity between these locations was restored in 43 seconds, but this brief outage triggered a chain of events that led to 24 hours and 11 minutes of service degradation." Most of that time involved restoring the database clusters to a supported topology.
+#
+
+AI-1:
+  # we made several public estimates on time to repair based on the rate of processing of the backlog of data. In retrospect, our estimates did not factor in all variables. We are sorry for the confusion this caused and will strive to provide more accurate information in the future. [Earlier ...] In reality, the time required for replication to catch up had adhered to a power decay function instead of a linear trajectory [... at one point ...] replication delays were increasing instead of decreasing.
+  
+  experience: They made several optimistic TTR estimates, which misled customers
+  action: Consider more variables when estimating TTR
+  target: Customer communication procedures for TTR
+  goal: Set more accurate TTR expectations during incident
+
+  lifecycle: Response / Customer communication (TTR)
+  action-type: evo / alter / strengthen
+  sts: Process / Customer communication (for IR)
+  google-ai: mitigate future #/ improve incident management
+  intended-effect: Interaction Capability / User assistance (accuracy)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # Connectivity between [data centers] was restored in 43 seconds, but this brief outage triggered a chain of events that led to 24 hours and 11 minutes of service degradation. [Primarily due to primaries (and then of course replicas)] in west coast instead of east coast data center. [Because] It’s possible for Orchestrator to implement topologies that applications are unable to support, therefore care must be taken to align Orchestrator’s configuration with application-level expectations. [So they plan to] adjust the configuration of Orchestrator to prevent the promotion of database primaries across regional boundaries. Orchestrator’s actions behaved as configured, despite our application tier being unable to support this topology change [...] cross-country latency was a major contributing factor during this incident. This was emergent behavior of the system [...]
+
+  experience: Due to the network disconnectivity, the orchestration software caused a fallback to unsupported topology (cross DC), which caused increased latency that the application tier was unable to support
+  action: Adjust configuration defining allowed topologies
+  target: Database cluster manager (Orchestrator)
+  goal: Prevent promotion of cross-region DB primaries
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent #/ initial failure
+  intended-effect: Safety / Operational constraint (to prevent emergent behavior)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-3:
+  # While many portions of GitHub were available throughout the incident, we were only able to set our status to green, yellow, and red [which] doesn’t give [customers] an accurate picture of what is working and what is not
+
+  experience: The status information displayed was correct but did not give customers an accurate picture of what was working and what is not (granularity)
+  action: Accelerate on going migration (replacing mechanism)
+  target: Status page (status reporting mechanism)
+  goal: Communicate per service status during incidents
+
+  lifecycle: Response / Customer communication
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: mitigate future #/ incident response (communication)
+  intended-effect: Interaction Capability / User assistance (status page granularity)
+
+  matrix-influence: consequence
+  matrix-approach: capability 
+
+AI-4:
+  # [...] In the weeks prior to this incident, we had started a company-wide engineering initiative to support serving GitHub traffic from multiple data centers in an active/active/active design [...] The goal of that work is to tolerate the full failure of a single data center failure without user impact. This is a major effort and will take some time [...] This incident has added urgency to the initiative. [...] Applications running in the East Coast that depend on writing information to a West Coast MySQL cluster are currently unable to cope with the additional latency introduced by a cross-country round trip for the majority of their database calls
+
+  experience: A maintenance action to replace equipment led to a 43s network partition between DCs, and the system cannot yet tolerate a full failure of a single data center without user impact (downtime was 12 hours)
+  action: Rearchitect as "well-connected sites in a geography"
+  target: Application & dependencies execution architecture (multiple DC)
+  goal: Tolerate single data center failure with no user impact
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts:
+    - Tech / Infra
+    - Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-5:
+  # [Discussion of role of chaos based testing due to complexity...] To bolster those efforts, we will also begin a systemic practice of validating failure scenarios before they have a chance to affect you. This work will involve future investment in fault injection and chaos engineering tooling at GitHub.
+
+  experience: The failure scenario included an unexpected promotion of cross-country primary, which led to high latency, and would be hard to test for
+  action: Add systemic (chaos) practice for validating failure scenarios
+  target: Testing practices (system level)
+  goal: Validate failure scenarios before they cause use impact
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Process / Testing practices
+  google-ai: prevent #/ validate more scenarios (hard to predict ones)
+  intended-effect: Reliability / Faultlessness (catch before)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-6:
+  # [Discussion of role of chaos based testing due to complexity...] To bolster those efforts, we will also begin a systemic practice of validating failure scenarios before they have a chance to affect you. This work will involve future investment in fault injection and chaos engineering tooling at GitHub.
+
+  experience: The failure scenario included an unexpected promotion of cross-country primary, which led to high latency, and would be hard to test for
+  action: Add fault injection and chaos engineering tooling
+  target: Testing tools (system level)
+  goal: Validate failure scenarios before they cause use impact
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Support 
+  google-ai: prevent #/ validate more scenarios (hard to predict ones)
+  intended-effect: Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

@@ -1,0 +1,81 @@
+#
+# 24.yaml | AWS
+# https://aws.amazon.com/message/5467D2/
+#
+# A network disruption led to DynamoDB storage servers asking metadata servers for updated "membership" information. Because membership information was larger now than previously for many tables (due to GSIs) many of these requests timed out. The metadata service was overwhelmed and storage servers marked themselves as unavailable.
+#
+
+AI-1:
+  # When the network disruption occurred on Sunday morning, and a number of storage servers simultaneously requested their membership data, the metadata service was processing some membership lists that were now large enough that their processing time was near the time limit for retrieval [leading to timeouts and retries] First, we have already significantly increased the capacity of the metadata service.
+
+  experience: A network disruption caused some (recently-become more time-expensive) requests to timeout and be retried, causing a synched storm of requests which overloaded the database and took healthy storage servers to retract their availability
+  action: Significantly increase capacity 
+  target: Distributed datastore (partition) metadata subsystem
+  goal: Handle load from similar network disruptions (GUESS)
+
+  lifecycle: Failure / Inception
+    #- Pre-incident # [TODO] Deployment of Global indexes with perf changing characteristics?
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent #/ add capacity
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # Second, we are instrumenting stricter monitoring on performance dimensions, such as the membership size, to allow us to thoroughly understand their state and proactively plan for the right capacity.
+
+  experience: They did not have detailed enough monitoring to check for an important dimension (partitions per table) which would have shown they were under capacity and near a limit
+  action: Instrument system with monitoring on performance dimensions (response sizes)
+  target: Distributed datastore (partition) metadata subsystem
+  goal: Support proactive capacity planning (understanding of state)
+
+  lifecycle: Pre-incident
+  action-type: evo / add
+  sts: Process / Maintenance procedures
+  google-ai: detect / prevent # "several actions...to avoid a recurrence"
+  intended-effect:
+    - Maintainability / Analysability
+    - Safety / Hazard warning
+    - Performance Efficiency / Time behavior (membership size)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # Third, we are reducing the rate at which storage nodes request membership data and lengthening the time allowed to process queries.
+
+  experience: A recent change in request membership data changed performance characteristics and pushed the system closer to limits
+  action: Reduce retry frequency & increase request timeout value
+  target: Distributed datastore (nodes using metadata service)
+  goal: Reduce resources required for synchronization
+
+  lifecycle: Pre-incident # [TODO] Deployment of Global indexes with perf changing characteristics?
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization
+    - Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-4:
+  # Finally and longer term, we are segmenting the DynamoDB service so that it will have many instances of the metadata service each serving only portions of the storage server fleet. This will further contain the impact of software, performance/capacity, or infrastructure failures.
+
+  experience: A network disruption and subsequent retry storm overloaded much of the metadata service and took many, initially unrelated and unaffected, storage volumes out of service
+  action: Partition service, splitting load
+  target: Distributed datastore architecture
+  goal: Contain impact of various failure types
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: mitigate future #/ isolate failure (localize)
+  intended-effect: Reliability / Fault tolerance (split for redundancy & isolation to limit impact)
+
+  matrix-influence: consequence 
+  matrix-approach: capability
+

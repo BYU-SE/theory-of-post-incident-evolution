@@ -1,0 +1,25 @@
+#
+# 15.yaml | Zalando
+# https://github.com/zalando-incubator/kubernetes-on-aws/blob/dev/docs/postmortems/jun-2019-kubelet-qps.md
+#
+# Linked PA's PR: https://github.com/zalando-incubator/kubernetes-on-aws/pull/2247
+#
+# Description: Continuous delivery platform builds were failing for almost an hour since pods couldn't get AWS IAM credentials. A low request rate limit on a configuring process and the rapid creation and deletion of pods caused the configuring process to fall behind.
+#
+
+AI-1:
+  # CDP builds were timing out and failing because Kubernetes builder Pods couldn’t get AWS IAM credentials [because too many nodes started up for the very low qps setting on the kubernetes API server] To stop the bleeding, the cluster was manually scaled up so builder Pods would be spread over more than 1 node. For a permanent fix, the Kubelet QPS was increased from 5 (default) to 50 via a global cluster configuration.
+
+  experience: Low configured rate limit for operation (API requests) led to outage when too many requests were being made to only one node
+  action: Increase configured request rate limit
+  target: Cluster configuration (kubelet QPS value)
+  goal: Increase node creation throughput (preventing build failures)
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent #/ handle triggering condition (high start rate)
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability

@@ -1,0 +1,62 @@
+#
+# 59.yaml | Travis CI
+# http://blog.travis-ci.com/2017-09-20-sept-6-11-macos-outage-postmortem
+# https://web.archive.org/web/20170923014456/http://blog.travis-ci.com/2017-09-20-sept-6-11-macos-outage-postmortem
+#
+# Instability in their storage infrastructure (SAN) was caused by ongoing performance limitations. The storage got too full too keep up with demands and had to be shutdown and cleaned. The service operated with reduced capacity for an extended time.
+# 
+
+AI-1:
+  # Ongoing performance limitations with our current shared SAN platform were leading to hypervisor host instability. SAN storage got too full to be able to keep up with our I/O demands. We’re currently working with our infrastructure provider on a new dedicated SAN platform which will bring dedicated capacity with faster storage and increased storage network throughput.
+
+  experience: Performance limitations of SAN platform
+  action: Create new dedicated storage infrastructure to replace existing
+  target: Storage infrastructure (array hardware/firmware)
+  goal: Bring dedicated capacity with faster storage and increased throughput
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Infrastructure / Data center storage
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Time behavior (space and throughput)
+    # - Performance Efficiency / Capacity (dedicated capacity)
+  qa-category: extend range (new infrastructure)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # Over time the amount of used space on our SAN LUNs had grown. We had initially attributed this to our overall growth in usage and concurrent load, and realized too late that due to the host instability mentioned above, we were accumulating orphaned folders/files on the SAN that were not visible to existing cleanup processes. This reduction in free space hit a point where there was too little space for the SAN to be able to keep up with our peak load. [..] Through the cleanup process, we developed a set of scripts which were able to help us identify and cleanup orphaned files/folders. While we anticipate that improvements from the new SAN platform will be sufficient enough to prevent the accumulation of orphaned files/folders in the future, we plan to utilize some of these scripts to do reporting and generate metrics to measure and verify that the new SAN platform brings the improvements we expect.
+
+  experience: Orphaned folders and files on SAN used up space over a long period of time, and eventually reached a point where there was too little space to keep up with peak load
+  action: Use scripts for reporting, monitoring, and verification of the new replacement storage infrastructure
+  target: Metrics reporting for storage infrastructure
+  goal: Measure and verify that replacement infrastructure conforms to expectations
+
+  lifecycle: Failure / Inception
+    #- Pre-incident # [TODO] Slow fill up of space, led to limit being hit
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # There will also be some forthcoming announcements about other product changes we may be implementing to help manage the overall travis-ci.org macOS backlog.
+
+  experience: They managed the QoS to customers through a backlog (trying to clear it)
+  action: Make changes (VAGUE)
+  target: Job execution system (for builds) backlog management
+  goal: Help manage the macOS backlog
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (manage)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

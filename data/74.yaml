@@ -1,0 +1,274 @@
+#
+# 74.yaml | Mozilla
+# VOID: https://hacks.mozilla.org/2019/07/add-ons-outage-post-mortem-result/
+# Other: https://wiki.mozilla.org/Add-ons/Expired-Certificate
+# Technical: https://wiki.mozilla.org/Add-ons/Expired-Certificate-Technical-Report
+#
+# Decision: We are basing our AIs on the 2nd of these pages because it has a table of next steps.
+
+AI-1:
+  # Tuning our Incident Command Process by looking at some of the following areas to create a more structured playbook:
+  # Crisis levels and descriptions.
+  # Phone numbers, back-ups and contact protocols.
+  # Clear owners and roles.
+  # Clear processes for incident kickoff, handoffs and documentation.
+  # Template support responses that can be customized for each situation.
+  # Documented safety response procedures.
+  # Protocols to ensure we have things like passwords for social media accounts.
+  # What are all the blogs and communication channels we have and when to use them.
+
+  # NOTE: Obviously could be more that one AI (but I'm going with "create a more structured playbook" as the AI)
+
+  experience: Large response with hundreds of staff and volunteers, with various delays
+  action: Major restructuring of response runbook and protocols
+  target: Incident response processes and documentation
+  goal: Quicker, more clear response and responsibilities
+
+  lifecycle: Response / Triage
+  action-type: evo / add
+  sts: Process / Incident response / Documentation and procedures
+  intended-effect: Interaction Capability / Operability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2: 
+  # A full map of all the various deployment channels we can use to ship code to users for all our products
+  # Balrog, Normandy, Dot Releases etc.
+  # Clear understanding of how many users we reach.
+  # Process and decisions for using a particular channel.
+  # Trade offs and impact analysis.
+  # Clear decision makers and owners for each channel.
+  # Shipping checklist and process.
+  # Confusion around our deployment channels surfaced in many of the post mortem discussions. Next steps are to find a lead and team to tackle this project. Pieces of this are underway already.
+
+  experience: How to deploy fix was confusing and maybe not optimal (many options with unclear tradeoffs)
+  action: Document deployment options, use cases and trade-offs
+  target: Incident response processes and documentation
+  goal: Easier more accurate decision making (for deploying fixes)
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type: evo / add
+  sts: Process / Incident response / Documentation and procedures
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Recoverability
+  google-ai: mitigate future
+  
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3: 
+  # Investigate a plan for deploying a "real" hotfix to everybody (big red button) in a similar emergency. We had to deploy multiple dot releases and other remediations just to get everybody running again.
+
+  experience: How to deploy fix was confusing and maybe not optimal (many options with unclear tradeoffs)
+  action: Investigate plan for global fix deployment
+  target: Incident response deployment tooling
+  goal: Deploy to all all users at once (in emergency)
+  
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type:
+    - formative / discover options
+    - evo / add
+  sts: Tech / Support / Deployment tooling
+  intended-effect: Reliability / Recoverability
+  google-ai: mitigate future
+  
+  matrix-influence: consequence
+  matrix-approach: capability # emergency fix deployment
+
+AI-4: 
+  # As we attempted to deploy remediations we kept running into a number of bugs and edge cases to handle. We recommend that we map out a full failure cascade in detail to understand if there are improvements we can make for the future.
+
+  experience: Deployment hit defects and edge cases
+  action: Consider all ways failure cascaded and look for improvements
+  target: UNCLEAR
+  goal: Avoid failures during remediation
+  
+  lifecycle:
+    - Failure / Recovery
+    - Failure / Downstream Effects
+  action-type: 
+    - formative / investigative
+    - evo / subtract # find and fix bugs
+  sts: UNCLEAR
+  intended-effect:
+    - Reliability / Recoverability
+    - Reliability / Fault tolerance
+  google-ai:
+    - investigate
+    - mitigate future
+  
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-5: 
+  # Detailed audit of anything with an expiry date so we understand what other time bombs might be out there. Bug logged.
+
+  experience: Failure was triggered by certificate expiration
+  action: Audit for similar failures (expirations)
+  target: UNCLEAR
+  goal: Avoiding hitting similar expiration limits
+  
+  lifecycle: Failure / Inception
+  action-type: 
+    - formative / check
+    - evo / subtract # find and fix bugs
+  sts: Tech / Core
+  intended-effect: Safety / Operational constraint
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-6: 
+  # Plan for the certificate that will expire in 2025. Bug logged.
+
+  experience: Failure was triggered by certificate expiration
+  action: Fix certificate expiration defect (before 2025)
+  target: App add-ons (plugins) signing 
+  goal: Avoid triggering same defect in the future
+  
+  lifecycle: Failure / Inception
+  action-type:
+    - formative / schedule
+    - evo / subtract # fix bug (time bomb)
+  sts: Tech / Core
+  intended-effect: Safety / Operational constraint
+  google-ai: prevent
+  
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-7: 
+  # Now that we understand the importance of add-on support for mobile (ratings plummeted during the incident), we might want to reconsider that strategy/priority for Fenix.
+
+  experience: Add-ons could not be loaded during incident and ratings plummeted
+  action: Reconsider strategy for add-ons
+  target: Future mobile browser
+  goal: Avoid similar issues in future product
+
+  lifecycle: Failure / Downstream Effects
+  action-type: formative / discover options # "reconsider strategy"
+  sts: Tech / Core
+  intended-effect: UNCLEAR # Compatibility / Co-existence
+  google-ai: unrelated
+
+  matrix-influence: unrelated # not related to future failures (product strategy) 
+  matrix-approach: unrelated # not related to future failures (product strategy)
+
+AI-8:
+  # Solution for QA support on the weekend and during an incident of this level. This can be broader and cover how we handle incidents outside of the more normal business hours [...] Raised with Engineering Leadership. Look at next steps for prioritizing.
+
+  experience: Incident happened on weekend with limited testing support (and there were no tests for scenario)
+  action: Add QA support during off work hours
+  target: Support and incident response practices
+  goal: Improve how they handle incidents outside normal hours
+
+  lifecycle:
+    - Response / Mitigation
+
+  action-type:
+    - formative / schedule # prioritizing
+    - evo / add
+  sts: Process / Incident response / QA support
+  intended-effect:
+    - Reliability / Faultlessness
+    - Reliability / Recoverability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-9: 
+  # Detailed post mortem to look at events and decisions that caused us to delete a week’s worth of Telemetry data for all Desktop users. 
+
+  experience: Telemetry data was deleted 
+  action: Perform sub-postmortem about this issue (lost data)
+  target: UNCLEAR
+  goal: Better data safety
+
+  lifecycle: Response / Mitigation
+  action-type: 
+    - formative / investigative
+    - evo / subtract # find and fix
+  sts: Process / Incident response
+  intended-effect: Interaction Capability / Operability
+  google-ai: 
+    - investigate
+    - mitigate future
+  
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-10: 
+  # Investigate some broadcast mechanism in our product so we can let our users know that we are aware of an issue. We used many channels, responded to threads directly. This was time consuming.
+
+  experience: Many channels used to communicate to users
+  action: Investigate and add mechanism to broadcast to all users (one channel)
+  target: Web browser messaging (to end users)
+  goal: More efficient user communication
+
+  lifecycle: Response / Customer communication
+  action-type:
+    - formative / discover options
+    - evo / add
+  sts: Tech / Support
+  intended-effect: Interaction Capability / User assistance
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-11: 
+  # Deeper investigation into the systems involved for handling add-ons and security.
+  # Better understanding of how the add-on signing system works and more complete documentation of the entire system.
+  # Improvements to our certificate management process and key rollover strategies
+  # Project is underway to investigate this further. Will likely break out into multiple sub projects.
+
+  experience: Add-ons could not be loaded during incident and ratings plummeted
+  action: Investigate, document and improve (rollover strategy)
+  target: Web browser add-ons and certificate management
+  goal: Better handle certificate rollover (major cross-cutting concern)
+
+  lifecycle: Failure / Downstream Effects
+  action-type:
+    - formative / investigative
+    - evo / alter / weaken # investigate and improve
+  sts: Tech / Core
+  intended-effect:
+    - Reliability / Availability
+    - Interaction Capability / Operability
+  google-ai:
+    - investigate
+    - prevent
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-12: 
+  # Explore diversity in the configurations that we run in continuous integration.
+
+  experience: Failure was triggered by certificate expiration, which was not covered by a category of tests
+  action: Explore options and add more diversity for test environments (configs)
+  target: Testing environment
+  goal: Catch in test
+
+  lifecycle: Failure / Inception
+  action-type:
+    - formative / discover options
+    - evo / add
+  sts: Tech / Support
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Faultlessness
+  google-ai: prevent
+
+  matrix-influence: likelihood 
+  matrix-approach: capability
+  

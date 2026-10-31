@@ -1,0 +1,41 @@
+#
+# 22.yaml | Cloudflare
+# https://blog.cloudflare.com/a-post-mortem-on-this-mornings-incident/
+#
+# Description: "On June 17, at 08:32 UTC, our systems detected a significant packet loss between multiple destinations on one of our major transit provider backbone networks, Telia Carrier [...] Today, Jun 20, at 12:10 UTC, our systems again detected massive packet loss on one of our major transit provider backbone networks: Telia Carrier.
+#
+
+AI-1:
+  # In today’s incident, we identified weaknesses in our communication: the scope of the incident was incorrectly identified in Europe only, and our response time was not adequate. We want to reassure you that we are taking all the steps to improve our communication, including implementation of automated detection and mitigation systems that can react much more quickly than any human operator. We already have such systems in place for our smaller data centers and are actively testing their accuracy and efficacy before turning them on for larger PoPs. We have been working on building a mechanism (which augments BGP) to proactively detect packet loss and move traffic away from providers experiencing packet loss. Because this system is currently activated only for our most remote and smallest locations, it didn't trigger in this morning’s incident. We plan to extend the capability in the next 2 weeks to switch from a manual reaction to an automatic one in all our POPs.
+
+  experience: Packet drops happened for 20 minutes before manual response was taken
+  action: Test (accuracy & efficacy) & use automation (more widely)
+  target: Automated mitigation systems and metrics analysis (of networking systems)
+  goal: React to incidents more quickly than a human operator 
+
+  lifecycle:
+    - Response / Detection
+    - Response / Mitigation
+  action-type: evo / alter / strengthen # add to more places
+  sts: Tech / Support
+  google-ai: mitigate future # deleted `detect`
+  intended-effect: Reliability / Fault tolerance (automate and responsiveness)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # Our customers understandably expect prompt, accurate information and want the impact to stop as soon as possible [...] We know how important it is to communicate on our status page [...] Our support team is working on improvements in how we update our status page and reviewing the content for accuracy as well as transparency.
+
+  experience: UNCLEAR
+  action: Improve status page updating and reviewing (VAGUE)
+  target: Customer communication status page updates
+  goal: Prompt and accurate customer communication
+
+  action-type: evo / alter / strengthen
+  sts: Process / Customer communication (for IR)
+  google-ai: mitigate future #/ incident management (communication)
+  intended-effect: Interaction Capability / User assistance (accuracy & transparency)
+
+  matrix-influence: consequence 
+  matrix-approach: capability 

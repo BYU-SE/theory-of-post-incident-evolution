@@ -1,0 +1,78 @@
+#
+# 17.yaml | AWS
+# http://aws.amazon.com/message/4372T8/
+#
+# Description: "our utility provider suffered a loss of power at a regional substation as a result of severe weather in the area. This failure resulted in a total loss of utility power to multiple AWS facilities. In one of the facilities, our power redundancy didn't work as designed, and we lost power to a significant number of instances in that Availability Zone."
+#
+# "Remediation"
+#
+
+AI-1:
+  # The specific signature of this weekend’s utility power failure resulted in an unusually long voltage sag (rather than a complete outage). Because of the unexpected nature of this voltage sag, a set of breakers responsible for isolating the DRUPS from utility power failed to open quickly enough [...] In order to prevent a recurrence of this correlated power delivery line-up failure, we are adding additional breakers to assure that we more quickly break connections to degraded utility power to allow our generators to activate before the UPS systems are depleted.
+
+  experience: Breakers did not open quickly enough after an unusually long voltage sag (not outage), causing a power outage
+  action: Add breakers between utility, generators and servers
+  target: Data center power infrastructure (UPS, etc)
+  goal: Prevent draining reserve power in event of power "sag"
+
+  lifecycle: Failure / Inception
+  action-type: evo / add # add more
+  sts: Infrastructure / Data center power delivery systems
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (more quickly react)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # A latent bug in our instance management software led to a slower than expected recovery of the remaining instances [...] fix the latent issue that led to our recovery systems not being able to automatically recover a subset of customer instances. That fix is already in testing, and will be deployed over the coming days.
+
+  experience: Latent defect in instance management software led to slower than expected, and only partial recovery
+  action: Fix latent defect; test and deploy fix
+  target: Fleet and cluster instance management service
+  goal: Speed up recovery after power loss (avoid need to manually recover)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: mitigate future #/ reduce recovery time
+  intended-effect: Reliability / Recoverability (automatic)
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability 
+
+AI-3:
+  # We will also be starting a program to regularly test our recovery processes on unoccupied, long-running hosts in our fleet. By continually testing our recovery workflows on long-running hosts, we can assure that no latent issues or configuration setting exists that would impact our ability to quickly remediate customer impact when instances need to be recovered.
+
+  experience: Latent defect in instance management software led to slower than expected, and only partial recovery
+  action: Introduce testing program for instance recovery
+  target: Testing processes for recovery workflows
+  goal: Catch latent issues in code or configuration (related to recovery)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / add
+  sts: Process / Testing procedures #(for support system)
+  google-ai: mitigate future #/ catch recovery issues in test
+  intended-effect:
+    - Reliability / Recoverability
+    - Reliability / Faultlessness
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # For this event, customers that were running their applications across multiple Availability Zones in the Region were able to maintain availability throughout the event. For customers that need the highest availability for their applications, we continue to recommend running applications with this architecture. We know that it was problematic that for a period of time there were errors and delays for the APIs that launch instances. We are working on changes that will assure our APIs are even more resilient to failure and believe these changes will be rolled out to the Sydney Region in July. 
+
+  experience: UNCLEAR (a failure occurred?)
+  action: Improve resilience (VAGUE)
+  target: Fleet instance management systems (scaling)
+  goal: Ensure customers can still control their systems during failures
+
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance ("resilient to failure")
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

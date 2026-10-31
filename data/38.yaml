@@ -1,0 +1,21 @@
+#
+# 38.yaml | Blue Matador
+# https://www.bluematador.com/blog/post-mortem-kubernetes-node-oom
+#
+
+AI-1:
+  # After a few days I was able to confirm that the above fix worked. Memory usage on our nodes was stable and we were not having any issues with any component in Kubernetes, EC2, or EBS. I realize how important it is to set resource requests and limits for all of the pods I run, so it’s now on our backlog to implement some combination of default resource limits and resource quotas.
+
+  experience: A node in the production cluster experienced an OOM event, and memory increased periodically (close to edge)
+  action: Implement default resource limit and resource quotas
+  target: Cluster component resource limits (Kubernetes)
+  goal: Avoid resource related issues that can be addressed by bounds
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Safety / Operational constraint
+
+  matrix-influence: likelihood
+  matrix-approach: capability

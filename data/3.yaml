@@ -1,0 +1,179 @@
+#
+# 3.yaml | Datadog
+# https://www.datadoghq.com/blog/2020-09-25-infrastructure-connectivity-issue/
+#
+# A failure of the internal service discovery and dynamic configuration system was caused by a DNS record type (domain does not exist type) not being cached leading to a thundering herd.
+#
+# Section: Further decouple the control plane and the data plane
+
+AI-1:
+  # We have split service discovery and dynamic configuration into separate services.
+
+  experience: Core dependencies (service discovery and dynamic configuration) were located within the same service and that service was overwhelmed by traffic
+  action: Split into separate services
+  target: Service discovery & dynamic configuration service (multi AZ cluster)
+  goal: Decouple the control plane and the data plane
+
+  lifecycle: Failure / Downstream Effects # was: Failure / Triggering
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # We are building additional layers of cache to make DNS queries for the purpose of service discovery resilient to a prolonged loss of the core service discovery system.
+
+  experience: Core dependencies (service discovery and dynamic configuration) were located within the same service and that service was overwhelmed by traffic
+  action: Add additional caching layers
+  target: Cache layer for DNS queries (additional)
+  goal: Decouple the control plane & the data plane (for prolonged loss)
+
+  lifecycle: Failure / Downstream Effects # was: Failure / Triggering
+  action-type: evo / add
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # We are hardening all components to make them resilient to a prolonged loss of service discovery and dynamic configuration. When they are unavailable, services that process incoming data or answer interactive queries should fail “closed” and continue to work without degradation.
+
+  experience: Core dependencies (service discovery and dynamic configuration) were located within the same service and that service was overwhelmed by traffic and was down for an extended time
+  action: Harden interaction components to make them fail closed when dependency unavailable
+  target: Dependents of service discovery & dynamic configuration service
+  goal: Decouple the control plane and the data plane
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-4:
+  # With this change in place and its impact missed during the change review, the conditions were set for an unforeseen failure starting with a routine operation a month later. [..] We will regularly test the types of failures we experienced.
+
+  experience: The effects of the change (introducing dependencies in core services) was missed during change review,
+  action: Regularly test the types of failures
+  target: Testing processes
+  goal: Decouple the control plane and the data plane
+
+  lifecycle: Pre-incident
+  action-type: evo / add
+  sts: Process / Testing procedures
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-5:
+  # Improve the resilience of service discovery. The need to register and deregister services won’t go away but we must support it with a system that is not a single point of failure (be it distributed or not).
+
+  experience: Core dependencies (service discovery and dynamic configuration) were located within the same service and that service was overwhelmed by traffic
+  action: UNCLEAR
+  target: Service discovery service (multi AZ cluster)
+  goal: Improve resiliency by eliminating single point of failure
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-6:
+  # Improve the resilience of the web tier. Because the web tier sits in the middle of all queries made by our customers, it must be among the last systems to fail. This means reducing the number of hard dependencies to the absolute minimum [..AI-8..] to make sure pages still load if soft dependencies fail downstream.
+
+  experience: Web tier's core dependencies (service discovery and dynamic configuration) were located within the same service were unavailable
+  action: Reduce the number of hard dependencies
+  target: Web tier hard dependencies 
+  goal: Improve resiliency
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-7:
+  # Improve the resilience of the web tier. Because the web tier sits in the middle of all queries made by our customers, it must be among the last systems to fail. This means [..AI-7..] with regular tests to make sure pages still load if soft dependencies fail downstream.
+
+  experience: Web tier's core dependencies (service discovery and dynamic configuration) were located within the same service were unavailable
+  action: Regularly test to make sure pages work upon dependency failure
+  target: Tests against soft deps for web tier
+  goal: Improve resiliency
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-8:
+  # Our external response followed our usual playbook: update the status page when the issue is systemic and post updates every 30 minutes until resolution. In hindsight we were not as effective as we should have been to communicate clearly and unequivocally the impact of the incident and the steps we were taking. In this case, with so many services impacted, we scaled our internal response accordingly but did not do the same with our external response and our communication. We focused too much on the public status page and did not have a dedicated role in incident response to make sure our customers received timely updates if they were not watching our status page. [We will...] Improve our external response. It starts with having a dedicated role with clear processes to disseminate updates about high visibility incidents throughout. 
+
+  experience: There was a delay in posting a status and they did not effectively communicate the impact outside the status page
+  action: Add dedicated support role to communicate to customers
+  target: Customer communication and support (staffing)
+  goal: Improve external response (dedicated role to quickly disseminate information)
+
+  lifecycle: Response / Customer communication
+  action-type: evo / add
+  sts: People / Organizational structure (customer communication)
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-9:
+  # Improve our external response. It also includes having clearer communication on the impact of an incident as it develops. [TODO]: Is this the same as AI-8?
+
+  experience: There was a delay in posting a status and they did not effectively communicate the impact
+  action: UNCLEAR
+  target: Customer communication procedures
+  goal: Improve external response (clearer communication)
+
+  lifecycle: Response / Customer communication
+  action-type: evo / add
+  sts: Process / Customer communication
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-10:
+  # Provide a clear playbook in case of regional failure. Regardless of how much resilience we build into a Datadog instance running in a single region, there will remain a risk that the region becomes unavailable for one reason or another. We are committed to providing options for our customers to choose for contingency.
+
+  experience: UNCLEAR (failure as a whole across the region)
+  action: Provide a playbook for regional failure
+  target: Incident response documentation and procedures
+  goal: Give customers options during downtimes
+
+  lifecycle: Response / Mitigation # (customer options)
+  action-type: evo / add
+  sts: Process / Incident response / Documentation and procedures
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability
+
+  matrix-influence: consequence
+  matrix-approach: capability

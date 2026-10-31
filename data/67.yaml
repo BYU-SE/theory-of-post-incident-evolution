@@ -1,0 +1,107 @@
+#
+# 67.yaml | Honeycomb
+# https://www.honeycomb.io/blog/bitten-by-a-kafka-bug-postmortem
+# 
+
+AI-1: 
+  # This is apparently all due to a number of issues that have been fixed by kafka 0.10.2.1, so we need to upgrade our cluster ASAP
+
+  experience: Zookeeper cluster experienced a network partition and the controller did something about it to make it symptomatic much later
+  action: Upgrade cluster
+  target: Cluster infrastructure (Kafka)
+  goal: Remove triggering and contributing factors that have already been fixed
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # Get better instrumentation for kafka and zookeeper into honeycomb
+
+  experience: UNCLEAR # Could have been anything, though potentially the fact that they went down several wrong debugging paths
+  action: Increase monitoring and instrumentation
+  target: Monitoring for kafka and zookeeper systems
+  goal: Improve diagnosis and debugging
+
+  action-type: evo / add
+  sts: Tech / Support
+  intended-effect: Maintainability / Analysability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # Get the retriever kafka partition into ec2 instance tags, write shell functions for printing retriever/partition mappings
+
+  experience: UNCLEAR
+  action: Add extra metadata to running instances (retriever/partition mappings)
+  target: Kafka retrievers & debugging scripts
+  goal: Reduce confusion and cognitive load during debugging and monitoring
+
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  intended-effect: Maintainability / Analysability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # [Responders had to check kafka output to see failures had occurred] Instrumentation for failed writes to kafka (consume sarama response queue?)
+
+  experience: Responder efforts delayed by having to check outputs to see if failures were present
+  action: Add monitoring for failed writes
+  target: Kafka client (sarama) response queue (internal channels in Go)
+  goal: Improve detection of failures (UNCLEAR)
+
+  lifecycle:
+    - Response / Detection
+    - Response / Triage
+  action-type: evo / add
+  sts: Tech / Core 
+  intended-effect: Maintainability / Analysability
+  google-ai: detect / mitigate
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5:
+  # After restarting all kafka nodes (which we did with perhaps too much caution and care... it was a first time for the engineers working the outage), it turned out that the data nodes had an offset far ahead of the acknowledged offset, because kafka had kept accepting writes even though zookeeper didn’t acknowledge them as being part of the world. So we had to manually reset the offset on the data nodes and restart or bootstrap them as well. By 12:03pm the world was restored to order. [So we will...] Change the way data nodes handle invariants, to avoid manual intervention when it has with a kafka offset ahead of the broker’s
+
+  experience: Kafka was accepting writes even though zookeeper didn't acknowledge them, requiring that engineers had to manual reset the offset and restart/bootstrap them
+  action: Change offset handling
+  target: Kafka nodes (offset invariants) # from chatgpt: For example, a data node might have an invariant that its recorded Kafka offset should never exceed the broker’s current offset
+  goal: Allow automated recovery when coming online to discrepancies in kafka offset
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  intended-effect: Reliability / Recoverability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-6:
+  # Document the bash snippets, command lines, and other bits we used to debug retriever and kafka and create a production runbook for them
+
+  experience: Response involved a lot of custom tools to triage and debug
+  action: Document and create a production runbook for recovery processes
+  target: Runbook for debugging retrievers and Kafka
+  goal: Formalize important parts of recovery processes
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / add
+  sts: Process / Recovery 
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

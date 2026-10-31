@@ -1,0 +1,61 @@
+#
+# 55.yaml | Trivago
+# https://tech.trivago.com/2021/10/05/postmortem-removing-all-users-from-github.com/trivago/
+#
+# A user synchronization mechanism between active directory and GitHub meant that when a security group was deleted accidentally, 430 employees lost access to GitHub.
+# 
+
+AI-1:
+  # [An AzureAD security group was deleted and there is no way to restore the group. It was unclear who was removed which made restoration take longer] Backups: Create a regular and automated backup of AzureAD security group membership.
+
+  experience: An employee deleted security group instead of AAD user account being removed from group and there was no way to restore the group
+  action: Add regular and automated backup of active directory groups
+  target: Database backup of security groups (active directory groups)
+  goal: Be able to quickly recover
+
+  lifecycle: Failure / Recovery
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+  target-sts: process and secondary
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # [Human error resulted in deleting the group rather than a user] Access and roles: Review all users and their respective access to AAD. Think about establishing more granular permissions and require re-login to a different account to execute destructive actions.
+
+  experience: An employee deleted security group instead of AAD user account being removed from group
+  action: Review access, permissions to active directory and consider more restrictions
+  target: Active directory (access control)
+  goal: Prevent human error
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / strengthen
+    - formative / check
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # [To get access to the GitHub org, employees had to create a ticket and manual work was needed] Automation: Automate the Rights Management ticket process with a self-service portal or similar.
+
+  experience: To regain access to the organization after the data was deleted accidentally, employees had to create a ticket
+  action: Automate access to version control by creating (potentially a service portal)
+  target: Active directory service portal
+  goal: Eliminate human operations which are risky
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

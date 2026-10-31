@@ -1,0 +1,76 @@
+#
+# 19.yaml | Cloudflare
+# https://blog.cloudflare.com/cloudflare-dashboard-and-api-outage-on-april-15-2020/
+#
+# Disconnection of multiple, redundant fibre connections from one of two core data centers when technicians erroneously disconnected cables in a patch panel (switchboard) that provided all external connectivity to other data centers.
+#
+
+AI-1:
+  # As part of planned maintenance [..], we instructed technicians to remove all the equipment in one of our cabinets. That cabinet contained old inactive equipment [..] and had no active traffic or data [..]. The cabinet also contained a patch panel (switchboard of cables) providing all external connectivity to other Cloudflare data centers. Over the space of three minutes, the technician decommissioning our unused hardware also disconnected the cables in this patch panel. Design: While the external connectivity used diverse providers and led to diverse data centers, we had all the connections going through only one patch panel, creating a single physical point of failure. This should be spread out across multiple parts of our facility.
+
+  experience: Technician disconnected network cables, which included an important switchboard of cables providing all the external connectivity for the data center
+  action: Spread out external connectivity across multiple parts of facility
+  target: Data center level physical networking
+  goal: Remove single point of failure to ensure connectivity
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken # SOP
+  sts: Infrastructure / Data center networking infra design
+  google-ai: prevent #/ eliminate single point of failure
+  intended-effect: Reliability / Fault tolerance (redundancy)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # Documentation: After the cables were removed from the patch panel, we lost valuable time identifying for data center technicians the critical cables providing external connectivity to be restored. We should take steps to ensure the various cables and panels are labeled for quick identification by anyone working to remediate the problem. This should expedite our ability to access the needed documentation.
+
+  experience: Lost valuable time identifying cables for the technicians
+  action: Label cables and panels
+  target: Data center level physical networking (cables, etc)
+  goal: Quick identification of cables during remediation & likely maintenance
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Infrastructure / Data center networking infra documentation
+  google-ai: mitigate future #/ reduce time to resolve
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Recoverability
+
+  matrix-influence: consequence 
+  matrix-approach: capability 
+
+AI-3:
+  # Process: While sending our technicians instructions to retire hardware, we should call out clearly the cabling that should not be touched.
+
+  experience: Technician disconnected network cables, which included an important switchboard of cables providing all the external connectivity for the data center
+  action: Add "what not to do" to technician instructions (retiring hardware)
+  target: Infrastructure maintenance procedures for data center technicians
+  goal: Prevent (human) errors during hardware maintenance
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Process / Maintenance procedures (SOP)
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # We will be running a full internal post-mortem to ensure that the root causes of this incident are found and addressed.
+  experience: UNCLEAR (a failure occurred?) # [TODO] This should be the entire experience as a whole
+  action: Run a full internal post-mortem
+  target: UNCLEAR (the whole system)
+  goal: "Ensure that the root causes of this incident are found and addressed"
+
+  action-type: formative / investigative
+  sts: UNCLEAR
+  google-ai:
+    - prevent
+    - investigate #/ improve understanding
+
+  matrix-influence: unspecified 
+  matrix-approach: unspecified 
+

@@ -1,0 +1,62 @@
+#
+# 31.yaml | Honeycomb
+# https://www.honeycomb.io/blog/incident-report-running-dry-on-memory-without-noticing/
+#
+# Telemetry data ingestion processes ran out of memory, and alerting didn't prompt an incident response. A haphazard response to the SLO alerts occurred (blaming 3rd parties, not waking up, not declaring an incident) until an engineer noticed it was a leak and fixed the issue.
+# 
+# It is impossible to prevent every memory leak; therefore our technical fixes are primarily focused around detection and mitigation.
+# 
+
+AI-1:
+  # A high process crash (panic/OOM) rate is clearly abnormal in the system and that information should be displayed to people debugging issues, even if it is one of many potential causes rather than a symptom of user pain. Thus, it should be made a diagnostic message rather than a paging alert.
+
+  experience: Confirmation bias and crash information not being sent to responders delayed RCA
+  action: Show additional (non user facing) diagnostic (OOM) information
+  target: Alarming and monitoring system
+  goal: Speed up diagnosis, avoid "confirmation bias", challenge assumptions
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: mitigate future #/ diagnosis
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-2:
+  # The trigger of the incident was a slow memory leak that manifested over hours, which leaked at the same rate on each ingest backend [causing OOM crashes and loss of data] And rather than outright crash and thereby lose internal telemetry, we will consider adding backpressure (returning an unhealthy status code) to incoming requests when we are resource constrained to keep the telemetry with that vital data flowing if we're tight on resources. 
+
+  experience: Telemetry data was lost when a memory leak resulted in OOM and a crash.
+  action: Add backpressure as alternative to crashing (OOM) under scarcity
+  target: Backend ingest endpoints & dependents (error responses)
+  goal: Maintain telemetry data (otherwise lost on crash) to aid with diagnosis
+
+  lifecycle: Response / Diagnosis 
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future #/ diagnosis (and needed data)
+  intended-effect:
+    - Maintainability / Analysability (preserve telemetry)
+    - Flexibility / Scalability (backpressure)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-3:
+  # Ultimately, the main changes we need to make are to our incident process rather than technical ones. We should be more willing to believe SLO burn alerts, more willing to declare incidents, and more willing to investigate/question assumptions. We're taking this as a lesson that consistency matters, and we'd rather err on the side of declaring an unnecessary incident than fail to declare an incident and act haphazardly. We're promoting our user-facing SLO alerts to actually page oncall the same way our end-to-end blackbox probers do. 
+
+  experience: Unwillingness to believe SLO burn alerts, declare incidents, and investigate or question assumptions led to extended recovery
+  action: Promote certain user-facing alerts (SLOs) to page oncall
+  target: Alarming and monitoring system
+  goal: More quickly begin incident response & so act less haphazardly
+
+  lifecycle: Response / Triage
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: mitigate future #/ incident response initiating
+  intended-effect: Safety / Hazard warning (triage)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

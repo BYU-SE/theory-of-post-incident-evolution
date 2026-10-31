@@ -1,0 +1,53 @@
+#
+# 52.yaml | Algolia
+# https://www.algolia.com/blog/engineering/may-30-ssl-incident/
+#
+# A certificate expiration (from a third party) led to an outage, despite them having monitoring and awareness tools of certificates they manage
+# 
+
+AI-1:
+  # We’re reaching out to impacted customers and explaining what happened
+
+  experience: UNCLEAR (a failure occurred)
+  action: Communicate with customers
+  target: Customers
+  goal: Explain what happened to impacted customers
+
+  action-type: formative / other
+  sts: People
+  google-ai: repair
+
+  matrix-influence: unrelated # CHANGED
+  matrix-approach: unrelated # CHANGED
+
+AI-2:
+  # On May 30, a minute after 10:48 UTC when the certification authorities expired, our Site Reliability Engineering (SRE) team got notified that there was a certificate problem with our service. This was an unexpected message because we carefully check that our certificates are valid and don’t expire any time soon. [..] we're improving our certificate checking tool to verify expiration in the full chain, not just our leaf certificate
+
+  experience: Tooling did not catch the certificate problem
+  action: Verify expiration in the full chain, not just leaf certificate
+  target: Certificate checking tool
+  goal: Catch invalid certificates, more than leaf cert.
+
+  lifecycle: Failure / Inception # [TODO] Are these right?
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  intended-effect: Safety / Hazard warning
+  google-ai: detect / prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # we’ll include OpenSSL in our annual Open Source donations and will financially support the work of the OpenSSL team.
+
+  experience: UNCLEAR (openSSL involved in incident?)
+  action: Donate to OpenSSL team
+  target: OpenSSL team
+  goal: Support software in toolchain
+
+  action-type: evo / add
+  sts: People
+  google-ai: unrelated
+
+  matrix-influence: unrelated
+  matrix-approach: unrelated

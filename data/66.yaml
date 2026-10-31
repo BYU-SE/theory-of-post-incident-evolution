@@ -1,0 +1,57 @@
+#
+# 66.yaml | AWS
+# https://aws.amazon.com/message/680587/
+# 
+# A portion of the ELB state data was deleted when a maintenance process was run against production ELB state data, causing high latency and error rates for managing ELB instances.
+#
+
+AI-1: 
+  #  First, we have modified the access controls on our production ELB state data to prevent inadvertent modification without specific Change Management (CM) approval. Normally, we protect our production service data with non-permissive access control policies that prevent all access to production data. The ELB service had authorized additional access for a small number of developers to allow them to execute operational processes that are currently being automated. This access was incorrectly set to be persistent rather than requiring a per access approval. We have reverted this incorrect configuration and all access to production ELB data will require a per-incident CM approval. This would have prevented the ELB state data from being deleted in this event. This is a protection that we use across all of our services that has prevented this sort of problem in the past, but was not appropriately enabled for this ELB state data.
+
+  experience: Manual deletion of ELB state data on production environment (mistake)
+  action: Modify access controls to restrict access
+  target: ELB state data access policies
+  goal: Prevent modification without change management approval
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection # excluding the security aspect of this
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # We have also modified our data recovery process to reflect the learning we went through in this event. We are confident that we could recover ELB state data in a similar event significantly faster (if necessary) for any future operational event.
+
+  experience: UNCLEAR
+  action: Modify (VAGUE)
+  target: Incident response recovery process
+  goal: Ensure recovery process is much faster
+
+  action-type: evo / alter / strengthen
+  sts: Process / Recovery process (of data)
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # We will also incorporate our learning from this event into our service architecture. We believe that we can reprogram our ELB control plane workflows to more thoughtfully reconcile the central service data with the current load balancer state. This would allow the service to recover automatically from logical data loss or corruption without needing manual data restoration.
+
+  experience: Recovery from data loss involved lots of manual steps
+  action: Improve data reconciliation process
+  target: ELB control plane workflows
+  goal: Allow automated recovery from logical data loss or corruption
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

@@ -1,0 +1,58 @@
+#
+# 64.yaml | Travis CI
+# https://www.traviscistatus.com/incidents/khzk8bg4p9sy
+#
+
+AI-1: 
+  # We are preparing plans for more well defined load tests of our OS X infrastructure. As the OS X/iOS build workload represents a unique type of workload in terms of CPU and IO utilization, and the time these builds usually take, compared to the majority of our Linux builds. This testing will include multiple build jobs that represent the common types of repositories we see customers building and we will have better and more detailed metrics that we'll gather during these load tests. So you can look for a scheduled maintenance announcement in the future for this.
+
+  experience: VM cluster reached maximum capacity when a janitor process failed to clean up resources. Understanding resource usage, sizing, and time is unique compared to other workloads they supported.
+  action: Perform well-defined load tests for OS X infrastructure
+  target: Testing activities
+  goal: More accurately represent real traffic to ensure that it behaves well under load
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Support
+  intended-effect: Performance Efficiency / Resource utilization
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # We are going to make improvements to what metrics we collect when we create, run, and delete build VMs on the OS X infrastructure. We will also improve how these metrics are reported under failure conditions. These metrics improvements will help us build better alerts to help us avoid these kinds of issues in the future.
+
+  experience: VMs were leaked for several days before issue was discovered
+  action: Improve metrics that are collected and how they are reported under failure
+  target: Monitoring for services (Build systems for OS X Infrastructure)
+  goal: Help us build better alerts to avoid these kinds of issues
+
+  lifecycle: Response / Detection #- Pre-incident # [TODO] Happened before?
+  action-type: evo / add
+  sts: Tech / Core
+  intended-effect: Maintainability / Analysability
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # Some of the impact of this incident, in particular how we do a global stop/start of builds, and how they are re-queued, will be improved in ways that will result in less impact to running builds. These will happen as we build and ship some fundamental improvements to our build agent software.
+
+  experience: Janitor process failed to cleanup VMs leading to higher re-queues
+  action: Improve how builds are started and stopped and re-queued globally
+  target: Job execution service (CI/CD)
+  goal: Reduce impact on running builds
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core 
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Recoverability
+
+  matrix-influence: consequence # CHANGED
+  matrix-approach: vulnerability # CONFIRMED
+

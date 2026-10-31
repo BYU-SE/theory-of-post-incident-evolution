@@ -1,0 +1,110 @@
+#
+# 56.yaml | Google
+# https://static.googleusercontent.com/media/www.google.com/en//appsstatus/ir/to3hkm2wc4v4xq7.pdf
+#
+# A certificate update issue caused an expiration leading to clients being unable to establish or reestablish connections.
+# 
+
+AI-1:
+  # [There was an issue with updating certificate configurations and so a certificate expired inadvertently. We will] Configure additional proactive alerting for upcoming certificate expiration events
+
+  experience: Issue (assumed defect) led to an inadvertent certificate expiration
+  action: Add proactive alerting
+  target: Monitoring system for certificate configurations
+  goal: Detect upcoming certificate expirations before they happen to provide warning
+
+  lifecycle: Response / Detection # ("expired inadvertently")
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / prevent
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # [A certificate expired and clients were unable to establish or reestablish an SIP connection] Configure additional reactive alerting for TLS errors in Google Voice frontend systems.
+
+  experience: After an inadvertent certificate expiration, clients were unable to establish or reestablish connections
+  action: Add reactive alerting for TLS errors
+  target: Monitoring system for frontend systems (?)
+  goal: Alert on TLS errors
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / mitigate # its reactive alerting
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # Due to an issue with updating certificate configurations, the active certificate in Google Voice frontend systems inadvertently expired at 2021-02-15 23:51:00, triggering the issue. [..] Improve automated tooling for certificate rotation and configuration updates.
+
+  experience: Issue (assumed defect) led to an inadvertent certificate expiration
+  action: Improve automated tooling for certificate rotation and configuration updates (VAGUE)
+  target: Automated certificate rotation and configuration update tooling
+  goal: Prevent the issue from occurring
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / Operability (automated changes)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # [Emergency deployment still took 2 hours from initial rollout to completion] Utilize more flexible infrastructure for rapid deployment of configuration changes
+
+  experience: Fix deployment took 2 hours to complete
+  action: Utilize a more flexible infrastructure (VAGUE)
+  target: Deployment infrastructure
+  goal: Reduce deploytime for emergency deployments
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability (rapid deployment)
+    - Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5:
+  # Update resource allocation systems to more efficiently provision emergency resources during incidents
+
+  experience: UNCLEAR
+  action: Update resource allocation systems for emergency resources (VAGUE)
+  target: Service resource allocation systems
+  goal: More efficiently provision emergency resources
+
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: mitigate future
+  intended-effect: Performance Efficiency / Resource utilization (emergency resources)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-6:
+  # Develop training and practice scenarios for emergency rollouts of Google Voice frontend systems and configurations
+
+  experience: The diagnosis and fix took 2 hours to complete
+  action: Develop training and practice scenarios for emergency rollouts
+  target: Deployment strategies for emergency rollouts
+  goal: Improve response
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Process / Mitigation practices
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (expertise with incident response)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

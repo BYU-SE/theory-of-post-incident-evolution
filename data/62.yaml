@@ -1,0 +1,118 @@
+#
+# 62.yaml | Buildkite
+# https://buildkite.com/blog/outage-post-mortem-for-august-22nd
+#
+# An unplanned outage where no one was able to login, view build logs, or read documentation, which happened while engineers were asleep.
+# 
+
+AI-1:
+  # [The database experienced performance issues, the CPU started maxing out as they moved into peak traffic period. They had recently scaled down the database and had not observed it for very long.] Do load testing after significant infrastructure changes. Due to the tight time constraints before the next AWS bill, we didn’t load test the new database or the centralized pgbouncer setup. We’ve already started planning how this could work and ways we can do it without impacting others using the system.
+
+  experience: They felt pressure to get these changes out sooner rather than later, and didn't do due diligence to figure out if the new database would perform under heavy load. The database became overloaded under peak traffic.
+  action: Do load testing after significant infrastructure changes without impacting others
+  target: Testing practices
+  goal: Prevent the overload scenario seen in the incident
+
+  lifecycle: Pre-incident / Lead up
+  action-type: evo / add
+    # - formative / discover options # This is a progress report
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Flexibility / Scalability (management)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-2:
+  # [Health checks failed because the database was down even though the app layer was healthy, leading to the ELB removing servers which were healthy]  We need to figure out the trade offs here: would we prefer all servers to get dropped out of an ELB? Or would we prefer to just throw HTTP 500 errors if it can’t connect to our database. We’ve switched it now to just return “OK” if it can hit the app. We don’t check database connectivity in this request anymore. [..AI-3..]
+
+  experience: DB was overloaded, and health checks started to remove healthy servers due to a dependency on the database
+  action: Remove health check dependency on database
+  target: Health checking system for applications
+  goal: Prevent the removal of healthy application servers
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Downstream Effects
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: vulnerability # CONFIRMED
+
+AI-3:
+  # [Health checks failed because the database was down even though the app layer was healthy, leading to the ELB removing servers which were healthy] We need to figure out the trade offs here: would we prefer all servers to get dropped out of an ELB? Or would we prefer to just throw HTTP 500 errors if it can’t connect to our database. [..AI-2..] We’re also considering adding another health check endpoint that Pingdom can hit which makes sure the application can connect to the database and any dependent services.
+
+  experience: DB was overloaded, and health checks started to remove healthy servers due to a dependency on the database
+  action: Add health check endpoint for database and dependency connectivity
+  target: Health checking system for applications (external)
+  goal: Prevent the removal of healthy application servers
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Downstream Effects
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Safety / Fail safe (resolving health check issues) 
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CHANGED
+
+AI-4:
+  # [Replacement servers were not going healthy because they depended upon an image value, which when their website was down, defaulted to a very old version which no longer worked. This prevented them from coming back online.] We’ve now switched to storing the latest deployed revision as file on S3 and we reference that when newly launched servers need to self-deploy.
+
+  experience: When the website went down, replacement servers used an old version (baked into the image as a default value)
+  action: Remove hard-coded image configuration and store image on S3 (change dependency)
+  target: Deployment process for application
+  goal: Remove hard-coded value and swap to a dependency which is more reliable for hosting VM images
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: likelihood # CHANGED
+  matrix-approach: vulnerability # CONFIRMED
+
+AI-5:
+  # [The on-call setup failed when it couldn't reach the team which was asleep.] We’ve all done manual tests to ensure calls are getting through. We’d like to investigate whether or not we can trigger company-wide tests to make sure everyone’s setup is correct on a regular basis. 
+
+  experience: On-call setup failed when it couldn't reach team which was asleep
+  action: Manually test paging settings and investigate company wide checks
+  target: Testing practices for paging setups
+  goal: Ensure everyone's setup is correct
+
+  lifecycle: Response / Triage
+  action-type: 
+    - formative / check
+    - evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Safety / Hazard warning
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-6:
+  # [The on-call setup failed when it couldn't reach the team which was asleep.] Another idea is to have PagerDuty call team members when they go “on-call” — or have a requirement that all Notification Rules contain a “Immediately phone” rule. We haven’t looked into whether or not PagerDuty supports this out of the box, but we’ll be reaching out to them to see what we can do.
+
+  experience: On-call setup failed when it couldn't reach team which was asleep
+  action: Change paging settings to (include a) call
+  target: Paging setups
+  goal: Ensure on-call engineers are reached during an incident
+
+  lifecycle: Response / Triage
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Safety / Hazard warning
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

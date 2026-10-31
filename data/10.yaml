@@ -1,0 +1,120 @@
+#
+# 10.yaml | Honeycomb
+# https://www.honeycomb.io/blog/postmortem-rds-clogs-cache-refresh-crash-loops/
+#
+# Partial API outage and repeated incident led to emergency maintenance for 2 minutes. Datastore was slow and the caching layer would send a thundering herd of cache refreshes. The datastore reached tipping over points and led to OOMs.
+# [For all of the below actions, the key explanatory quote is:] The real risk factor was that our production RDS instance's CPU utilization had been idling around a baseline of 30-40% for some time [and also that when RDS slowed down the cache refresh attempts] was enough to tip us over [...]
+#
+
+AI-1:
+  # Previously, when a cache entry expired, it was assumed to be gone from the cache, and any subsequent requests for it would return “not found”. The caller would then typically do a DB query and put the result back into the cache with the correct TTL. The fix is to change the cache behavior such that only a single goroutine at a time is refreshing the cache. This fixes the thundering herd of cache refreshes that happens after RDS falls behind.
+
+  experience: When RDS falls behind (already high base utilization and there can be a usage spike), there is a thundering herd of cache refreshes
+  action: Only allow one cache refresh at a time (per key?)
+  target: Cache on service for DB, refresh strategy
+  goal: Prevent thundering herd
+
+  lifecycle: Failure / Downstream Effects # CHANGED
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Performance Efficiency / Resource utilization (compute time and resources and requests)
+    #- Reliability / Faultlessness (well-behaved & prevents thundering herd) # CHANGED
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-2:
+  # For one thing, we had simply reached a usage volume where we benefited more from throwing money than engineer-hours at this particular database problem. We scheduled a brief emergency maintenance window about 12 hours after the 10/11 outage to upgrade our production RDS instance from m4.xlarge to m5.2xlarge, which briefly interrupted all services for a few minutes but reduced our idling utilization percentage from 30-40% to 6%. It also had the bonus effect of reducing and dramatically stabilizing query times.
+
+  experience: When RDS slowed down, cache entries expired and more routines than usual attempted to refresh the cache, creating a feedback loop
+    - They tipped over when baseline CPU utilization (30-40%) rose with a usage spike (50-60%) and the cache refreshes occurred at the same time
+  action: Scale up hardware (database instance type)
+  target: Database (RDS)
+  goal: Reduce CPU utilization (avoid tip over)
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Infra
+  google-ai: prevent #/ scale up (hardware)
+  intended-effect:
+    - Performance Efficiency / Capacity (CPU)
+    - Performance Efficiency / Time behavior (stable)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # We used our internal Honeycomb instance to inspect the latency of our highest volume RDS queries, and identified cases where we could stand to reduce their frequency.
+
+  experience: They tipped over when baseline CPU utilization (30-40%) rose with a usage spike (50-60%) and the cache refreshes occurred at the same time
+  action: Inspect latency of most common queries (identify)
+  target: Database queries
+  goal: Reduce load on database
+
+  lifecycle: Failure / Inception
+  action-type:
+    - formative / discover options
+    - evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent #/ optimize (db query frequency)
+  intended-effect: Performance Efficiency / Resource utilization (query frequency)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-4:
+  # We considered slowing down or staggering the disk-usage-gathering cronjob that had been periodically causing our RDS utilization to spike 20%, so that it wouldn't hammer the database so much as soon as it started running.
+
+  experience: RDS utilization spiked with a cron job, on top of the baseline CPU utilization. And the cache refreshes that occurred at the same time caused a tipping over
+  action: Consider changing frequency of expensive cron jobs
+  target: Database cronjob schedules
+  goal: Reduce load on database
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / weaken
+    - formative / consider options
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Resource utilization (less frequently)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-5:
+  # We dug into that periodic cronjob more and noticed we were unnecessarily running it on all datasets, so we stopped running it on relatively stale datasets, yielding a ~25% reduction in that cronjob's DB writes.
+
+  experience: RDS utilization spiked with a cron job (which was being run on a larger dataset that necessary), on top of the baseline CPU utilization. And the cache refreshes that occurred at the same time caused a tipping over
+  action: Stop unnecessary queries on stale datasets (batch job)
+  target: Database cronjob (periodic)
+  goal: Reduce load on database
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Resource utilization
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-6:
+  # Observability is as much as factor of culture as code, and we also documented miscellaneous stumbling points and on-call processes that had caused confusion or burned time during the outage.
+
+  experience: Some factors caused stumbling when trying to recover (VAGUE)
+  action: Document problems and points of confusion during response
+  target: Incident response documentation and procedures
+  goal: Reduce time to resolve incidents (avoid confusion)
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+    - Response / Mitigation
+  action-type: evo / add
+  sts: Process / Incident response / Documentation and procedures
+  google-ai: mitigate future #/ decrease duration
+  intended-effect: Interaction Capability / Operability (response docs)
+
+  matrix-influence: consequence
+  matrix-approach: capability

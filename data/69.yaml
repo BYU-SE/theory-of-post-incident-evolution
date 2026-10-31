@@ -1,0 +1,156 @@
+#
+# 69.yaml | Wikimedia Foundation
+# https://wikitech.wikimedia.org/wiki/Incidents/2021-07-26_ruwikinews_DynamicPageList
+# An importing process caused many pages to be rebuilt, which involved an expensive query (which is not normally expensive). The expensive query was slow, blocking other queries from running and eventually leading to an outage where many requests were slow or had errors.
+#
+
+AI-1: 
+  # A query became slow all of the sudden, and was executing on many databases, slowing them all down. They have a dedicated database group for slower queries so they don't bog down the rest. 708390 Send queries to "vslow" database group
+
+  experience: Data import changed perf characteristics of query and it was running on many databases.
+  action: Send DPL queries to the slow database group
+  target: Database query configuration
+  goal: Ensure newly slow query doesn't affect all databases
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (at resource level)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2: 
+  # DPL is a known "trouble maker", and they are considering its future. T287916 Disable DPL on wikis that aren't using it
+
+  experience: Data import changed perf characteristics of query and it was running on many databases.
+  action: Disable DPL on wikis that do not use it
+  target: DPL wiki extension configuration
+  goal: Limit the future addition and use of DPL
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Faultlessness
+    - Safety / Operational constraint
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-3: 
+  # DPL queries can run many at the same time and since they take so long, they are not cached. T263220 Limit concurrency of DPL queries
+
+  experience: Data import changed perf characteristics of query and it was running on many databases. The response could not be cached since the queries would take so long to run.
+  action: Limit concurrency of DPL queries
+  target: DPL wiki extension query configuration
+  goal: Ensure DPL query can't take down all the databases
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Faultlessness
+    - Safety / Operational constraint
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-4: 
+  # T287983 Raw "upstream connect error or disconnect/reset before headers. reset reason: overflow" error message shown to users during outage
+
+  experience: Error message was shown to users (which was not supposed to be shown)
+  action: Fix raw error message being passed along
+  target: Web app error handling mechanism across (disparate components)
+  goal: Ensure correct error message is shown
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Faultlessness
+    - Interaction Capability / User assistance
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-5: 
+  # [Investigation revealed that googlenewssitemap does similar queries.] T288180 Investigate Extension:GoogleNewsSitemap query performance
+
+  experience: Data import changed perf characteristics of query and it was running on many databases. The response could not be cached since the queries would take so long to run, changing its perf characteristics even more
+  action: Investigate query performance for a plugin
+  target: Service plugin that creates RSS
+  goal: Check worst case performance for queries and if there are additional preventative measures needed
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / strengthen # goal suggests "protection"
+    - formative / investigative
+  sts: Tech / Core
+  google-ai: 
+    - investigate
+    - prevent
+  intended-effect:
+    - Safety / Operational constraint
+    - Performance Efficiency / Time behavior
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-6: 
+  # [Investigation revealed that googlenewssitemap does similar queries.] T288227 Add concurrency limiting to GoogleNewsSitemap using PoolCounter
+
+  experience: Data import changed perf characteristics of query and it was running on many databases. The response could not be cached since the queries would take so long to run, changing its perf characteristics even more
+  action: Limit concurrency of query for a plugin
+  target: Service plugin that creates RSS
+  goal: Remove triggering and contributing factors that have already been fixed
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Reliability / Faultlessness
+    - Safety / Operational constraint
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-7: 
+  # Maybe it would be cool if job runners slow down if a DB overload is detected
+
+  experience: Database was overloaded from really slow and expensive query
+  action: Slow down job runners if DB is overloaded
+  target: Job runner configuration
+  goal: Prevent overload from getting worse and being extended
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Performance Efficiency / Resource utilization
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-8: 
+  # Consider removing ordermethod=created as an unnecessary footgun
+
+  experience: Data import changed perf characteristics of query, especially with this particular parameter, and it was running on many databases.
+  action: Remove a configuration option which is less efficient
+  target: DPL wiki extension query configuration
+  goal: Remove less efficient configuration setting from the extension
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Resource utilization
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+

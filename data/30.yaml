@@ -1,0 +1,57 @@
+#
+# 30.yaml | WazirX
+# https://support.wazirx.com/hc/en-us/articles/900005490846-April-4-2021-Downtime-Analysis-Report
+#
+# A traffic spike led to a service provider rate limit being reached and the scaling system was unable to provision new servers, and traffic clogged the existing servers slowing them down.
+#
+
+AI-1:
+  # [The scaling system was unable to provision new instances when a service provider limit was reached. Traffic surged and the system became overwhelmed] As we continue to grow, we're working on preparing our scaling systems.
+
+  experience: Their existing servers were overloaded when the scaling system was unable to provision new instances when they hit a rate limit with the third party service provider
+  action: Prepare for future growth (VAGUE)
+  target: Fleet scaling systems
+  goal: Prevent scaling systems from not working
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Flexibility / Scalability (management)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-2:
+  # [Existing servers struggled to provide service under heavy load] We're also building systems in place to ensure that any issue in one part of a service does not affect the rest of our services.
+
+  experience: Their existing servers were overloaded when the scaling system was unable to provision new instances
+  action: Tolerate degradations in dependent services (VAGUE)
+  target: Systems to isolate failures within services (VAGUE)
+  goal: Ensure that issues in one part of a service do not affect the rest
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (decouple & tolerance to hard dependency failure)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # We'll also focus on communicating with you via all online channels and keeping you abreast of what is happening in real-time. 
+
+  experience: UNCLEAR
+  action: Focus on communicating (VAGUE)
+  target: Customer communication during incident
+  goal: Keep customers up to date during incident in real time
+
+  action-type: evo / add
+  sts: Process / Customer communication
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance (in real-time)
+
+  matrix-influence: consequence 
+  matrix-approach: capability 
+

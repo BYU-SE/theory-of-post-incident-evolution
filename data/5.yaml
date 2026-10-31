@@ -1,0 +1,80 @@
+#
+# 5.yaml | Autofarm
+# https://medium.com/autofarm-network/21-april-2021-venus-vaults-post-mortem-1518ae7399c6
+#
+# A version upgrade of Venus Protocol (a block chain/financial product managed by a separate team of "community" developers) without the knowledge of Autofarm that introduced a new fee structure. "Although steps were taken to prepare for this event, our vaults were still unable to fully cater for this fee" and manual withdraw actions were required by users.
+#
+# Autofarm incident report: https://medium.com/autofarm-network/21-april-2021-venus-vaults-post-mortem-1518ae7399c6
+# Archive Link: https://web.archive.org/web/20210901163409/https://medium.com/autofarm-network/21-april-2021-venus-vaults-post-mortem-1518ae7399c6
+#
+# Venus community post: https://blog.venus.io/a-letter-from-venus-to-community-members-and-users-ceb389210afc
+#
+
+AI-1:
+  # We will scale on the number of moderators and volunteers to have a more holistic coverage across the communities and different time zones. This way, better customer support can be provided as required by the community.
+
+  experience: Poor customer support during off-hours
+  action: Add moderators across "communities and different time zones"
+  target: Customer communication and support (moderators and volunteers)
+  goal: Improve customer support across timezones
+
+  lifecycle: Response / Customer support
+  action-type: evo / add # add to existing community
+  sts: People / Organizational structure (customer support)
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance (customer support)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-2:
+  # [Incident response was slow because] most of the team lives in the GMT+8 timezone [...] We will onboard more developers for more coverage on the different time zones so that the protocol has more bases covered even during the team’s wee hours.
+
+  experience: Slow incident response due to off-hours
+  action: Recruiting developers in more timezones
+  target: Customer communication and support (engineering staffing)
+  goal: Improved incident response during "team's wee hours"
+
+  lifecycle: Response / Triage
+  action-type: evo / alter / strengthen # add to existing devs
+  sts: People / Organizational structure (staffing)
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (timely incident response and around the clock)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-3:
+  # Unbeknownst to the Autofarm team, Venus Protocol’s VIP-12 part 1 was executed [...] We will set up an internal community that focuses on monitoring the different updates of the projects which we interact with on our platform (vaults which we deploy, DEXes which we integrate into AutoSwap and tokens which are whitelisted on our platform)
+
+  experience: A dependency change occurred unbeknownst to the team, which added a fee structure
+  action: Setup internal community (to monitor 3rd party projects)
+  target: Inter-project coordination and communication (support teams)
+  goal: Maintain awareness of changes made by integrated projects
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: People / Organizational structure
+  google-ai: prevent # is not reactive rather it is to forecast changes in the future
+  intended-effect: Interaction Capability / Operability
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED 
+
+AI-4:
+  # We will work more closely with these projects in a BSC Alliance to update the various projects who are interdependent to contribute to a thriving BSC community. (There is already an official BSC Ecosystem Partner Telegram Channel created by the Binance Chain team, better coordination can be done via such channels)
+
+  experience: A dependency change occurred unbeknownst to the team, which added a fee structure
+  action: (Improve process to) keep interdependent projects updated on changes (VAGUE)
+  target: Inter-project coordination and communication (VAGUE)
+  goal: Better coordination between integrated (third-party) projects
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen # work "more" closely
+  sts: Process / Development methodology # / Organization and coordination process
+  google-ai: prevent
+  intended-effect: Interaction Capability / Operability
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

@@ -1,0 +1,44 @@
+#
+# 61.yaml | Stack Exchange
+# http://stackstatus.net/post/156407746074/outage-postmortem-january-24-2017
+#
+# Stack Exchange network went into read-only mode for a few minutes as the SQL server triggered a bugcheck.
+# 
+#   - Complete Replacement: Not immediately
+#   - take down the server because you lose confidence its going to be good in the future (1)
+
+AI-1:
+  # Currently we do not know why SQL Server caused a bugcheck, however logs indicate a potential bad DIMM. At our memory capacity (384GB), we opted to bring the network online rather than waiting for the memory dump to complete. We have since taken NY-SQL02 out of production and have it down for testing (including a memory test).
+
+  experience: Rather than wait for a long memory dump, they chose to take the server out of commission after a potential hardware memory error
+  action: Remove from production and perform tests
+  target: Database server
+  goal: UNCLEAR
+
+  lifecycle: Response / Mitigation
+  action-type:
+    - formative / check
+    - evo / subtract
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness (hardware level possibly)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # [SQL cluster experienced an outage] We also took this opportunity to bring this SQL cluster up to 2016 SP1 CU1.
+
+  experience: Rather than wait for a long memory dump, they chose to take the server out of commission after a potential hardware memory error.
+  action: Update to new version
+  target: Database cluster software
+  goal: UNCLEAR
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / weaken
+  sts: Infrastructure / System software
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+

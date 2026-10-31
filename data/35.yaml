@@ -1,0 +1,144 @@
+#
+# 35.yaml | GitHub
+# https://github.com/blog/2101-update-on-1-28-service-outage
+# https://github.blog/news-insights/company-news/january-28th-incident-report/
+#
+
+AI-1:
+  # We identified the hardware issue resulting in servers being unable to view their own drives after power-cycling as a known firmware issue that we are updating across our fleet. [.. AI-2 ..]
+
+  experience: A class of drives were unable to restart after experiencing a brief disruption in power due to a known firmware issue (but not patched)
+  action: Updating the firmware
+  target: Data center hardware
+  goal: Remove defect to ensure drives can restart after power failure
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  intended-effect:
+    - Reliability / Recoverability
+    - Reliability / Faultlessness
+  google-ai: prevent
+
+  matrix-influence: likelihood 
+  matrix-approach: vulnerability
+
+AI-2:
+  # [We are ...] Updating our tooling to automatically open issues for the team when new firmware updates are available will force us to review the changelogs against our environment.
+
+  experience: A class of drives were unable to restart after experiencing a brief disruption in power, due to a firmware defect which been missed.
+  action: Automatically create issues when firmware updates are available
+  target: Data center hardware
+  goal: Force review of the changelogs against their environment for safety reasons
+
+  lifecycle: Failure / Inception
+  action-type: evo / add 
+  sts: Tech / Infra
+  intended-effect:
+    - Reliability / Recoverability
+    - Reliability / Faultlessness
+  google-ai: prevent
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-3:
+  # We had inadvertently added a hard dependency on our Redis cluster being available within the boot path of our application code. [..] We will be updating our application’s test suite to explicitly ensure that our application processes start even when certain external systems are unavailable and [.. AI-4 ..]. Obviously there are limits to this approach and there exists a minimum set of requirements needed to serve requests, but we can be more aggressive in paring down the list of these dependencies.
+
+  experience: They had inadvertently added a hard dependency in the start processes and it made mitigation challenging
+  action: Include tests for dependency unavailability
+  target: Test suite for application
+  goal: Ensure applications are known to be able to boot without certain external system availability
+
+  lifecycle: Response / Mitigation
+  action-type: evo / subtract
+  sts: Tech / Support
+  intended-effect: Reliability / Recoverability
+  google-ai: prevent
+
+  matrix-influence: likelihood 
+  matrix-approach: vulnerability 
+
+AI-4:
+  # We had inadvertently added a hard dependency on our Redis cluster being available within the boot path of our application code. [..] [.. AI-3 ..] and we are improving our circuit breakers so we can gracefully degrade functionality when these backend services are down. Obviously there are limits to this approach and there exists a minimum set of requirements needed to serve requests, but we can be more aggressive in paring down the list of these dependencies.
+
+  experience: They had inadvertently added a hard dependency in the start processes and it made mitigation challenging
+  action: Reduce hard dependencies
+  target: Circuit breakers in apps for backend services
+  goal: Apps gracefully degrade functionality when dependencies are down
+
+  lifecycle: Response / Mitigation
+  action-type: evo / subtract
+  sts: Tech / Core
+  intended-effect: Reliability / Fault tolerance
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability # CHECK circuit breaker in B or C?
+
+AI-5:
+  # We are reviewing the availability requirements of our internal systems that are responsible for crucial operations tasks such as provisioning new servers so that they are on-par with our user facing systems. Ultimately, if these systems are required to recover from an unexpected outage situation, they must be as reliable as the system being recovered.
+
+  experience: Critical operations systems were offline as part of the incident
+  action: Review availability requirements
+  target: Internal operations systems (provisioning systems)
+  goal: Ensure support systems are as reliable as the systems they support
+
+  lifecycle: Response / Mitigation
+  action-type:
+    - formative / check # or audit
+    - evo / alter / weaken # fix availability issues
+  sts: Tech / Support
+  intended-effect: Reliability / Recoverability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-6:
+  # A number of less technical improvements are also being implemented. Strengthening our cross-team communications would have shaved minutes off the recovery time.
+
+  experience: UNCLEAR
+  action: Strengthen cross-team communications (VAGUE)
+  target: Engineering teams communication
+  goal: Recover much faster
+
+  action-type: evo / alter / strengthen
+  sts: People
+  intended-effect: Reliability / Recoverability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-7:
+  # A number of less technical improvements are also being implemented. Predefining escalation strategies during situations that require all hands on deck would have enabled our incident coordinators to spend more time managing recovery efforts and less time navigating documentation.
+
+  experience: UNCLEAR (related to navigating documentation)
+  action: Predefine escalation strategies during all hands on deck situations
+  target: Incident response procedures
+  goal: Better allocate time to manage incident rather than navigating documentation
+
+  action-type: evo / add
+  sts: Process / Incident response / Documentation and procedures
+  intended-effect: Reliability / Recoverability
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-8:
+  # A number of less technical improvements are also being implemented. Improving our messaging to you during this event would have helped you better understand what was happening and set expectations about when you could expect future updates.
+
+  experience: UNCLEAR (related to customer communication)
+  action: Improve (VAGUE)
+  target: Customer communication during incident
+  goal: Help customers understand what was happening and set expectations for future updates
+
+  action-type: evo / alter / strengthen
+  sts: Process / Customer communication
+  intended-effect: Interaction Capability / User assistance (in real-time)
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability

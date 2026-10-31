@@ -1,0 +1,231 @@
+#
+# 7.yaml | Elastic
+# https://www.elastic.co/blog/elastic-cloud-incident-report-feburary-4-2019
+#
+# During an upgrade of hosts in the coordination layer high traffic and a defect led to CPU softlocks and a ZooKeeper failure. A portion of the high traffic was due to reconnection attempts due to the instability caused by high latency. A second set of services (Kibana dashboards) that depend on the ZooKeeper ensemble also failed due to a defect that left unsuccessful connections open (and there were many because of failures to connect to the Zookeeper ensemble).
+#
+
+AI-1:
+  # The ZooKeeper ensemble came under high load (CPU, IO, memory), with large numbers of client connection failures and re-connects across the ensemble [...] Reduced the dataset size carried by our ZooKeeper ensembles by over 60%. By doing so, network and disk I/O requirements for ZooKeeper are greatly reduced during normal operation, as well as providing faster recovery times for ensemble members joining the quorum. (Completed)
+
+  experience: Adding a new ensemble member had synchronized, costly resync operation
+  action: Reduce size of stored and replicated configuration data
+  target: Distributed datastore manager (sync mechanisms, etc)
+  goal: Reduce I/O requirements and recovery times
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent #/ optimize (data stored and replicated)
+  intended-effect:
+    - Performance Efficiency / Resource utilization (req/res sizes and I/O)
+    - Reliability / Recoverability
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # Once the ZooKeeper ensemble and observers were stable, the proxy fleet was scaled up and out to handle the increased traffic to ES clusters [...] Reduced the number of health-checks and intervals required to allow a proxy node, marked as healthy, to join our load balancing layer as eligible targets to route traffic. This action item aims to reduce the mean time to recovery. (Completed)
+
+  experience: Startup and activation health checks delayed new nodes from joining the load balancing layer
+  action: Reduce checks and time needed when adding new nodes
+  target: Health checking system used by load balancer
+  goal: Reduce mean-time to recovery by increasing activation speed
+
+  lifecycle: Failure / Recovery
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability (time)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-3:
+  # Further revamp the logic around our proxy health-checks to not account for ZooKeeper connectivity as part of the checklist. With this change, once a proxy is successfully initialized, and has received its configuration and cluster routes, it will no longer drift to an unhealthy state due to the state of the supporting ZooKeeper ensemble. This change aims to sacrifice a potential small consistency skew over general availability. (In progress)
+
+  experience: Health check logic accounted for connectivity to dependency
+  action: Remove dependency connectivity from health check logic
+  target: Health checking system used by load balancer
+  goal: Maintain general availability by not removing healthy nodes
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / subtract
+  sts: Tech / Support # (load balancer)
+  google-ai: mitigate future # downstream cascade isolation (healthy nodes dropped when ZK is down), not the incident root cause
+  intended-effect:
+    - Reliability / Availability
+    - Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-4:
+  # The ZooKeeper ensemble came under high load (CPU, IO, memory), with large numbers of client connection failures and re-connects across the ensemble [...] Canarying the ground up rewrite of our proxy layer in production regions, as one of the final steps to switch to our proxy v2 architecture. The v2 architecture decouples the proxy service from the ZooKeeper state. (In progress)
+
+  experience: Once the client connections were re-established, the proxy layer began to exhibit high load due to a large influx of external re-connections
+  action: Rollout decoupled "v2 architecture" in stages
+  target: Network proxy service coupled to "ZooKeeper state"
+  goal: Avoid cascades & vicious cycles
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken # decouple
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (decouple & tolerance to hard dependency failure)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-5:
+  # Service metrics had reported the hosts as healthy [...] however, the metrics proved to be insufficient in conveying the state of individual hosts and of the coordination layer as a whole [leading to] unanticipated instability on and between hosts, which ultimately led to an overall failure of the coordination layer [...] Improve visibility around ZooKeeper by further investing in our internal logging strategy and introducing better metrics around the ZooKeeper processes, the JVM, and container/host systems. (In progress)
+
+  experience: Incorrect decisions were made when health metrics are insufficient to convey the state of the hosts and coordination layer as a whole
+  action: Add additional logging & metrics across system layers
+  target: Metrics reporting across system layers (app, JVM, container)
+  goal: Provide more accurate state information (visibility into health)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future # not having metrics allowed the incident to take place (proceeded with patching)
+  intended-effect:
+    - Maintainability / Analysability (across layers)
+    - Interaction Capability / User error protection
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-6:
+  # To enable inter-host traffic using TLS, an ancillary container is used for services like Kibana to communicate internally to its Elasticsearch cluster securely. Each allocator host is running that container to allow secure, auditable connections to other hosts within Elastic Cloud [...] Kibana instances were not able to connect to their target Elasticsearch clusters due the internal TLS proxying service being unable to forward requests to the proxy layer [...] Improve resiliency in Kibana routes discovery methods. (In progress)
+
+  experience: Requests could not be routed due to discovery failure during the incident
+  action: Improve resiliency in (route discovery) code (VAGUE)
+  target: Route discovering mechanism for data viz app (Kibana)
+  goal: Reliable routing during incidents (increase resilience)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken # fix bugs
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-7:
+  # A set of previously unknown bugs in Kibana was resulting in [...] HTTP request amplification back to the load balancing layer, driving extra traffic to the proxy layer and Elasticsearch deployments [...] Other issues with Kibana that were determined to lead to request amplification are also being investigated [...] Identifying and solving issues with Kibana that lead to internal HTTP request amplifications during availability events. (In progress)
+
+  experience: Latent defect caused internal HTTP request amplification back to the load balancing layer during availability events
+  action: Identify and solve issues with HTTP request amplification
+  target: Interaction code from data viz app (Kibana) to load balancer
+  goal: Uncover and understand the amplification of requests "during availability events"
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken # fix bugs
+  sts: Tech / Core
+  google-ai:
+    - investigate # "previously unknown bugs ... also being investigated"
+    - mitigate future # not worse "during availability events"
+  intended-effect:
+    - Reliability / Faultlessness (well-behaved & preventing request amplification)
+    - Performance Efficiency / Resource utilization
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-8:
+  # A set of previously unknown bugs in Kibana was resulting in connection leaks [...] Identifying and solving issues with Kibana that lead to connection leaking. (In progress)
+
+  experience: Latent defect leaked open sockets until a limit was reached and internal proxy service was unable to forward requests
+  action: Identify and fix connection leak bugs
+  target: Interaction code from data viz app (Kibana) to load balancer
+  goal: Uncover and understand unknown bugs that resulted in connection leak
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai:
+    - investigate # "previously unknown bugs ... Identifying and solving"
+    - mitigate future # not worse "during availability events"
+  intended-effect:
+    - Reliability / Faultlessness (preventing connection leaks)
+    - Performance Efficiency / Resource utilization
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-9:
+  # A stable quorum was established by reducing client load and reducing operator debugging actions on the impacted ZooKeeper hosts [...] Identified and mitigated issues with internal monitoring agents not employing proper backoff strategies with Jitter. (Completed)
+
+  experience: Operator debugging actions impacted hosts by adding load without backing off
+  action: Investigate and fix backoff strategy in retry code
+  target: Internal monitoring agent retry code
+  goal: Reduce load on distressed services (during debugging)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization
+    - Reliability / Fault tolerance
+    - Reliability / Faultlessness
+
+  matrix-influence: likelihood 
+  matrix-approach: vulnerability 
+
+AI-10:
+  # [Maintenance activities triggered the event and the event lasted into peak times] Formalized our maintenance matrix to reduce exposure of critical services within a region. We will be operating within specific timeframes for each region to limit the exposure of a failure to non-critical times. (Completed)
+
+  experience: Routine patching that worked before led to an incident which lasted into peak times
+  action: Add regional maintenance change windows (add formality)
+  target: Maintenance procedures (maintenance matrix)
+  goal: Reduce likelihood of (human triggered) incident during peak
+
+  lifecycle: Failure / Recovery
+  action-type: evo / alter / strengthen
+  sts: Process / Maintenance procedures (SOP)
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Availability (exposure time)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-11:
+  # A call was made to roll forward with the operation [...] Provide our team with an improved decision criteria matrix in runbooks that involves regular maintenance operations with the coordination layer. (In progress)
+
+  experience: Routine patching that worked before led to an incident which lasted into peak times
+  action: Improve "decision criteria matrix" in runbooks
+  target: Maintenance procedures (human decision making)
+  goal: Reduce likelihood of maintainer triggered incidents
+
+  lifecycle: Failure / Downstream Effects (human operator)
+  action-type: evo / alter / strengthen
+  sts: Process / Maintenance procedures (SOP) / Runbook
+  google-ai: prevent
+  intended-effect:
+    - Interaction Capability / User error protection
+    - Safety / Operational constraint (through good runbooks)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-12:
+  # Established a feedback loop with our support leadership team for communications that go out through support or the status page. This will make sure we are answering the right questions and providing relevant updates. (Completed)
+
+  experience: UNCLEAR
+  action: Add procedure involving support leadership feedback
+  target: Customer communication procedures (status page)
+  goal: Better inform customers during incident (relevant information)
+
+  action-type: evo / add
+  sts: Process / Customer communication (for IR)
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance (relevant)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

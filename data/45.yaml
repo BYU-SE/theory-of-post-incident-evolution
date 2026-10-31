@@ -1,0 +1,39 @@
+#
+# 45.yaml | Gandi
+# https://news.gandi.net/en/2020/09/postmortem-regarding-the-network-incident-from-september-15th-2020-on-iaas-and-paas-fr-sd3-fr-sd5-and-fr-sd6/
+# 
+# During maintenance, an error in the architecture and configuration caused layer 2 network loops to be introduced and interrupting services twice in one day. (about 20 minutes in total)
+# 
+
+AI-1:
+  # Short term, to finish the network maintenance. Completion of the migration while taking the restrictions of the extended L2 network into account.
+
+  experience: Due to an error in the architecture and configuration, a layer 2 network loop was introduced during maintenance operations.
+  action: Carefully complete migration, considering restrictions of network
+  target: Customer instances
+  goal: Use care to not introduce the loop again during this maintenance
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen # more careful process
+  sts: Tech / Infra
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # Mid term. Migration of the instances still using this extended L2 network so it can be removed cleanly.
+
+  experience: Due to an error in the architecture and configuration, a layer 2 network loop was introduced during maintenance operations.
+  action: Completely migrate all instances using the extended L2 network
+  target: Customer instances
+  goal: Make sure customers instances are all on a single data center
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Infra
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+

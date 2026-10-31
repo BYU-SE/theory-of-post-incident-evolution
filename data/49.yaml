@@ -1,0 +1,83 @@
+#
+# 49.yaml | Manta
+# https://www.joyent.com/blog/manta-postmortem-7-27-2015
+# https://tritondatacenter.com/blog/manta-postmortem-7-27-2015
+# 
+# Autovaccuum process blocked all database transactions and caused clients to experience high latency and error responses to about 22% of all types of requests
+#
+
+AI-1:
+  # [A tunable cleanup process for the database was part of the incident] We will take this opportunity to carefully examine the relevant tunables to make sure they're configured to run autovacuum appropriately.
+
+  experience: A transaction executed requested exclusive lock on table while a tunable clean up process was running
+  action: Examine relevant tunables to make sure they are correct
+  target: Database tooling (cleanup process)
+  goal: Make sure the process is tuned correctly
+
+  lifecycle: Failure / Inception
+  action-type:
+    - formative / check # going through existing settings
+    - evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # We'll validate those settings in our pre-production environment under high load.
+
+  experience: A transaction executed requested exclusive lock on table while a tunable clean up process was running
+  action: Validate settings in pre-production environment (under load)
+  target: Database tooling (cleanup process)
+  goal: Make sure the configuration works under load
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / weaken
+    - formative / check
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-3:
+  # [An automated process with large performance consequences was part of the incident] We will also be examining the relevant statistics that can be used to identify that these operations are running, have completed, and are cleaning up the issues they're intended to clean up.
+
+  experience: A transaction executed requested exclusive lock on table while a tunable clean up process was running. They have historically struggled to tune databases to perform maintenance processes
+  action: Examine the statistics to verify operation status and health
+  target: Metrics reporting for database cleanup process
+  goal: Make sure they know the complete state of process
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / strengthen # evaluation capability
+    - formative / discover options
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # we're heartened that the data we gathered during the outage later allowed us to identify our own locking issue as the most direct and actionable cause [...] but we will be prioritizing work to avoid the query that attempted to take the exclusive table lock ...
+
+  experience: In particular scenario query blocked all other queries
+  action: Eliminate query (that took exclusive lock)
+  target: Database and application queries
+  goal: Prevent deadlock at database level
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Time behavior (avoiding deadlock)
+    - Reliability / Availability
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability

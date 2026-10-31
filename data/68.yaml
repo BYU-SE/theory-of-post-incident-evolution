@@ -1,0 +1,43 @@
+#
+# 68.yaml | Sentry
+# https://blog.sentry.io/2015/07/23/transaction-id-wraparound-in-postgres
+#
+
+AI-1:
+  # By querying Postgres' internal statistics we identified that the autovacuums actually had finished on all of the relations except one. That relation however is a massive one. [..] We’ve got a few ideas on how to resolve this problem, but the biggest is splitting relations into multiple databases. This has its own set of challenges as connection management is a fairly complex thing, but it’s at the very least predictable and understood. Time is more favorable now as well and the machine tuning has provided lots of breathing room.
+
+  experience: Autovacuum did not finish on a table with a complex relationship
+  action: Split relationships into multiple databases
+  target: Database table
+  goal: Make sure autovacuum completes next time
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken 
+  sts: Tech / Core
+  google-ai: prevent # root cause: making autovacuum complete prevents wraparound recurrence
+  intended-effect:
+    - Performance Efficiency / Resource utilization
+    - Performance Efficiency / Time behavior
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # We previously ran with too high a value for autovacuum_freeze_max_age and the default of 3 autovacuum workers. Additionally, we had been running with far too much delay in vacuuming which meant lower load on the system, but more idle time in maintenance. Our updated configuration: [..We will use this new configuration ..] There’s a number of other things we tune, though it’s all fairly standard these days.
+
+  experience: Autovacuum had been running with a less than ideal configuration (potentially how we got here, and why it took so long)
+  action: Use new configuration
+  target: Database tooling configuration
+  goal: Make sure autovacuum has optimal configuration to run normally and complete quickly
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: prevent # corrects the causal vacuum misconfig ("potentially how we got here")
+  intended-effect:
+    - Reliability / Faultlessness
+    - Reliability / Recoverability
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+

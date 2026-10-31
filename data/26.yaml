@@ -1,0 +1,41 @@
+#
+# 26.yaml | Incident
+# https://incident.io/blog/intermittent-downtime
+#
+# Unhandled panics caused app to crash.
+#
+# NOTE: We treat mitigations in this incident report as action items since they called a pause to regroup in which they checked in with everyone, wrote a collective understanding of the incident, and then decided on the next steps and allocated work? The report is written 2 weeks after the incident, and the work it describes was done within a few hours.
+
+AI-1:
+  # Mitigation 1: Ensuring we handle message panics. We add these panic handlers all over our app, so we shouldn’t have hit this issue. But clearly we did, given our app has just crashed repeatedly. The generic receiver did apply a recover, but we’d missed that the implementation of sub.Receive – which is in the Google Cloud Pub/Sub client – starts several new goroutines to handle the anonymous function we provide to the Receive method. So our first mitigation was to apply a recover to this handler, which we deployed at 16:48. Since this is a common piece of code used by all our event handlers, this mitigates the issue which caused this incident but it also removes this entire problem class for all other current and future subscriptions too.
+
+  experience: A message added to the queue was unhandled, causing a crash
+  action: Add missing crash handling code ("a recover")
+  target: App exception handling for async workers
+  goal: Prevent crashes from taking down the entire application (limit blast radius)
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (handle crashes)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # Mitigation 2: Separate our app by work type. It’s considered best practice to run different work types – say web requests, async workers, and long-running cron jobs – separately from one another. That's because [..] If one type of work behaves badly, such as panicking, it can’t adversely impact everything else. [..] We had begun the process of splitting these work types before this incident, and the app already had a clear logical separation between web, async workers and crons. The reason we hadn't completed the split was that we'd already got most of the value from logically separating, and prefer running as simple an app as possible. Adding another dyno would also increase our CI times slightly, so we'd been waiting for a clear push before making this change: obviously an incident like this is exactly that trigger. So after confirming we were happy with the approach, we implemented the physical split by adding a new ‘worker’ Dyno tier to Heroku and tweaking each entrypoint. [..] By 17:24, this change was running in production.
+
+  experience: A crash in the one type of work caused the entire app to crash, cascading into all types of work (same binary)
+  action: Physically split app by work type (add "Dyno")
+  target: App design (what work type runs where)
+  goal: Prevent adverse events (panics) from impacting other types of work
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future #/ limit scope of impact 
+  intended-effect: Reliability / Fault tolerance (split & isolation to limit impact)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability

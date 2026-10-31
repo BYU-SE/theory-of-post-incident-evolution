@@ -1,0 +1,203 @@
+#
+# 54.yaml | Twilio
+# https://www.twilio.com/blog/february-26-service-disruption-update
+#
+# A critical core service overloaded and caused a service disruption which impacted a broad set of Twilio products. They added capacity and caching to reduce load.
+# 
+
+AI-1:
+  # The root cause of the service disruption was when a critical service that manages feature-enablement for many Twilio products became overloaded. [We will] Reconfiguring the service with more aggressive auto-scaling behavior to better handle traffic spikes.
+
+  experience: Service became overloaded during a traffic spike
+  action: Make auto-scaling more aggressive
+  target: Service auto-scaling infrastructure (feature enablement service)
+  goal: Better handle traffic spikes
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Flexibility / Scalability (behavior at scale)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # The root cause of the service disruption was when a critical service that manages feature-enablement for many Twilio products became overloaded. [We will be] Removing this service from critical paths and [continued below ...]
+
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Remove hard dependency 
+  target: Cache on deps of feature enablement service
+  goal: Prevent service unavailability
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-11:
+  # [continued from above ...] and making client-side caching the default behavior to prevent service unavailability.
+
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Make caching the default
+  target: Cache on deps of feature enablement service
+  goal: Prevent service unavailability
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # [A critical service failed] Multiple Twilio products that rely on this feature-enablement service did not handle its failure gracefully and began to fail themselves, manifesting as customer-facing API errors and increased latency. [We will be] Reducing the service’s request timeout and refactor the service’s API to increase scalability.
+
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Reduce the timeout 
+  target: Request code in deps of feature enablement service
+  goal: Increase scalability
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Flexibility / Scalability (behavior at scale)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-10:
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Refactor API
+  target: Feature enablement service API
+  goal: Increase scalability
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Flexibility / Scalability (behavior at scale)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # [A critical service failed] Multiple Twilio products that rely on this feature-enablement service did not handle its failure gracefully and began to fail themselves, manifesting as customer-facing API errors and increased latency. [We will be] Reconfiguring the service’s failover mechanism to increase resilience in events of failures.
+
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Reconfigure the failover mechanism (VAGUE)
+  target: Feature enablement service failover mechanism configuration
+  goal: Increase resilience
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (to hard dep failure)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CHANGED
+
+AI-5:
+  # To resolve the immediate issue, we increased server capacity and added additional caching to reduce the load on the service. This took longer than anticipated because our standard procedure for bringing additional capacity online didn’t fully take into account the ongoing load that occurred as other services continuously retried their failed requests. [We will be] Refactoring the server’s approach to caching to decrease workloads.
+
+  experience: Service became overloaded during a traffic spike and adding capacity and caching (to reduce load) took longer than anticipated because procedure didn't take into account extra load from retries
+  action: Change caching strategy
+  target: Caching on feature enablement services dependents
+  goal: Decrease workload
+
+  lifecycle:
+    - Response / Mitigation # [TODO] is this from the human aspect?
+    - Failure / Recovery # [TODO] is this from the human aspect?
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Time behavior (caching)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-6:
+  # Although the service disruption was detected and our on-call engineering team was notified within 1 minute, our Status Page did not update for 25 minutes which led to further customer uncertainty. [..] We are also reviewing our tooling and procedures for communicating with customers during disruptions, including via our status.twilio.com page, to ensure you have accurate and up-to-date information.
+
+  experience: First status page update was late
+  action: Review tooling and procedures for customer communication
+  target: Customer communication tooling and procedures
+  goal: Ensure customers have accurate and up-to-date information
+
+  lifecycle: Response / Customer communication
+  action-type: 
+    - evo / alter / strengthen
+    - formative / check
+  sts:
+    - Tech / Support
+    - Process / Customer communication
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance (accuracy & timeliness)
+
+  matrix-influence: consequence # CONFIRMED 
+  matrix-approach: capability # CONFIRMED
+
+AI-7:
+  # Conducting an audit of our codebase to identify services with similar risk characteristics and remediate as appropriate.
+
+  experience: UNCLEAR (a failure occurred?)
+  action: Audit codebase for similar risk characteristics & remediate
+  target: Other services like feature enablement service
+  goal: Remove places where this could happen again
+
+  action-type:
+    - formative / check
+    - evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-8:
+  # Instituting common architecture best practices for client services to degrade more gracefully.
+
+  experience: Overloaded service was a critical dependency for many products, and those products did not tolerate the unavailability well
+  action: Institute common architecture (best practices)
+  target: Feature enablement service dependents
+  goal: Improve graceful degradation
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (to hard dep failure and graceful degradation)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: vulnerability # CONFIRMED
+
+AI-9:
+  # Improving our deployment tooling and on-call runbooks to better manage server fleet capacity across all our services, eliminating manual steps and shortening future time-to-recovery.
+
+  experience: Took longer than the targets for diagnosis and correction (2.5 hours) and manual steps required
+  action: Improve deployment tooling and runbooks (VAGUE)
+  target: Deployment tooling and on-call runbooks
+  goal: Better manage capacity, eliminate manual steps, and shorten future time-to-recovery
+
+  lifecycle:
+    - Failure / Recovery # CHANGED
+    - Response / Mitigation
+  action-type: evo / add
+  sts: Process / Operational documentation (runbooks)
+  google-ai: mitigate future
+  intended-effect:
+    - Flexibility / Scalability (management)
+    - Reliability / Recoverability
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

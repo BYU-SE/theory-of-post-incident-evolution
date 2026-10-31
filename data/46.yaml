@@ -1,0 +1,96 @@
+#
+# 46.yaml | PagerDuty
+# https://www.pagerduty.com/blog/outage-post-mortem-april-13-2013/
+#
+# A failure beginning in a common peering point resulted in two of three data centers going offline 
+#
+
+AI-1:
+  # During our analysis, we found that we didn’t have adequate logging to debug issues within some of our systems.  We have now added more logging and started to aggregate them into a single source for better searchability.
+
+  experience: Hard to debug issue due to inadequate logging
+  action: Add more logging and aggregate logs
+  target: Metrics reporting and logging
+  goal: Increase searchability to debug issues better
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # During the outage, most of the failed coordinator processes were restarted manually.  We are going to add a process watcher to restart such processes automatically.
+
+  experience: They had to restart the failed process manually
+  action: Add a automated process watcher to restart failed processes
+  target: Automated restart system (monitoring for processes)
+  goal: Reduce need for human intervention
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability (automation)
+    - Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # We also found that we didn’t have good visibility into the inter-host connectivity. We’ll be building a dashboard that shows this.
+
+  experience: They had limited visibility into inter-host connectivity
+  action: Build a dashboard which shows inter-host connectivity
+  target: Monitoring and dashboard system
+  goal: Increase visibility into inter-host connectivity
+
+  lifecycle: Response / Detection
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / mitigate 
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # We also found that not all of our engineering staff are up to date with Cassandra and ZooKeeper.  We’ll be investing time to train our staff on both of these technologies.
+
+  experience: Some staff lack some knowledge for their database and configuration managing tools
+  action: Train staff on database and configuration software being used
+  target: Incident response (staff training)
+  goal: Bring staff up to date with technologies being used
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: People / Training
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (expertise & training)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5:
+  # [Incident involved 2 data centers in AWS though the other data center in Linode was fine. The data centers in AWS shared a peering point which degraded, despite them thinking that the regions were completely independent data centers] Investigate moving off one of the AWS regions.  We’ll need to do our homework when picking a new hosting provider and the datacenter to avoid single point of failure.
+
+  experience: The two data centers shared a peering point which failed
+  action: Investigate moving data center to a new hosting provider
+  target: Data centers with shared peering point
+  goal: Avoid a single point of failure that could be shared if data centers are from the same hosting provider
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / weaken
+    - formative / discover options
+  sts: Infrastructure / Data center
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+

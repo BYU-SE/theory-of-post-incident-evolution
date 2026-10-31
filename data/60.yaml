@@ -1,0 +1,85 @@
+#
+# 60.yaml | Travis CI
+# https://www.traviscistatus.com/incidents/sxrh0l46czqn
+#
+# A new version of the service was deployed and builds were being incorrectly marked as failed, so the deployment was rolled back, but the rollback was unsuccessful as the previous version (ie, the version to rollback to) was not marked ("tagged") correctly in the source (Docker Hub).
+# 
+
+AI-1:
+  # We also learned we did not have alerting which included the errors logged when the image pulls were failing to find v2.5.0 [and a contributing factor was] missing coverage in terms of alerting for the errors which were being logged when the image pulls failed [...] As part of the incident resolution, we created additional alerting, so that we know we'll be notified about similar errors in the future.
+
+  experience: There was no alerting overage for when image pull failed to find a version
+  action: Add additional alerting
+  target: Alarming system
+  goal: Notify about similar errors in the future
+
+  lifecycle: Response / Detection  # [TODO] Are these right?
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / mitigate
+  intended-effect: Safety / Hazard warning
+
+  matrix-influence: consequence 
+  matrix-approach: capability 
+
+AI-2:
+  # It currently can take us multiple hours to fully cycle out instances because of the safe guards we have in place to do this recycling in a fashion that does not interrupt longer running (up to 2 hours for travis-ci.com users) jobs [and so] we are discussing both incremental and radical ways to change our instance replacement process and tooling, so that we can more quickly deploy and rollback future worker versions.
+
+  experience: It takes a long time to fully cycle out an instance due to safeguards to not interrupt long processes
+  action: Discuss incremental and radical changes (VAGUE)
+  target: Resource (cloud instances) management process & tooling
+  goal: Be able to more quickly deploy and rollback future worker versions
+
+  lifecycle: Response / Mitigation
+  action-type: 
+    - evo / alter / strengthen
+    - formative / discover options
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Interaction Capability / Operability (tools during incidents)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # A change appears to have effects on how bash handles exit codes [which was not] detected by our staging environment tests and revealed insufficient diversity in how our tests reflect the variety of builds [our] users are running [so] we are looking at how we can better improve the diversity of our tests in staging, to help better catch these kinds of regressions before they impact user builds.
+
+  experience: Staging env tests did not catch exit code handling defect
+  action: Investigate improvements to diversity of our tests in staging
+  target: Test suite in staging environment
+  goal: Catch these kinds of regressions before they impact customers
+
+  lifecycle: Pre-incident
+  action-type: 
+    - formative / discover options
+    - evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Reliability / Faultlessness (catch before)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # Additionally, due to the nature of how we provision the auto-scaled EC2 instances which run the builds, because builds are run in a push based fashion, and the manner in which we try to gracefully finish long running builds (travis-ci.com users have a timeout limit of 2 hours) [...] It currently can take us multiple hours to fully cycle out instances because of the safe guards we have in place to do this recycling in a fashion that does not interrupt longer running jobs. [...] Bigger picture, we [are] discussing the potential for moving to a more agent/pull based process for running each job, which would let us more easily replace the worker version without requiring us to restart user builds.
+
+  experience: It takes a long time to fully cycle out an instance due to safeguards to not interrupt long processes
+  action: Discuss re-architect build process (move to agent/pull based process)
+  target: Job execution system & "worker" versioning (build process)
+  goal: Enable easier updates to worker versions
+
+  lifecycle: Response / Mitigation
+  action-type: 
+    - evo / add
+    - formative / discover options
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Interaction Capability / Operability (during incidents)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

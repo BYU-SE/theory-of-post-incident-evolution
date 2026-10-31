@@ -1,0 +1,58 @@
+#
+# 47.yaml | GoCardless
+# https://gocardless.com/blog/incident-review-service-outage-on-25-october-2020/
+#
+# The certificate for their secrets management service expired and the new certificate was not picked up, so connections to the secrets management service began to fail. A full API outage occurred within a few minutes.
+# 
+
+AI-1:
+  # [The Vault connection failures began 7 minutes before the automated monitoring detected the issue] Monitoring: While we already had monitoring in place for the expiration of TLS certificates used by our Layer-7 load balancers, this monitoring did not extend to the simple TCP load balancer that Vault uses. We've now fixed this gap and use the Blackbox exporter to regularly check these too.
+
+  experience: Detection was delayed since there was no monitoring for the TCP load balancer's TLS certificate expiration
+  action: Actively monitor the load balancer in front of their secrets management service
+  target: Monitoring for load balancer
+  goal: Detect issues before they propagate into system failure
+
+  lifecycle: Response / Detection # Perhaps even forewarning
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / mitigate #/ monitoring (add missing metrics for load balancer)
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # [Vault server does not automatically detect changes to a certificate] Prevention: We'd like the Vault server to automatically reload its certificate if it has changed. As this feature is not available, we've deployed the Reloader controller to trigger rolling updates of Vault when the certificate data changes.
+
+  experience: The server did not automatically detect changes to a certificate and reload
+  action: Add a reloader controller to trigger rolling updates of secrets manager when certificates change
+  target: Service with state (expirable certificates)
+  goal: Ensure certificate changes are used by the secrets manager
+
+  lifecycle: Failure / Inception 
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Interaction Capability / Operability (automation when data changes)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # [A failure in envconsul, which can happen if Vault has a problem, will also take down the child process] Mitigation: Even if we can ensure that Vault will never serve an expired certificate again, there are other failure modes, such as network partitions to Vault, that we don’t want to affect other running services. For this, we are deploying a change to theatre-envconsul that will stop envconsul from managing the child process, while still allowing us to inject secret environment variables at container startup.
+
+  experience: The parent process managed the child process, and when there was a failure it also took took down the child process
+  action: Remove child process dependency on parent
+  target: Launcher (theatre-envconsul) for subprocess launcher (envconsul)
+  goal: Allow services to continue to run despite failure in dependency (envconsul)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (decouple & tolerance to hard dependency failure)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+

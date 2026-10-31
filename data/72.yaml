@@ -1,0 +1,58 @@
+#
+# 72.yaml | Reddit
+# https://www.reddit.com/r/announcements/comments/4y0m56/why_reddit_was_down_on_aug_11/
+#
+# Reddit was down and unreachable for 1.5 hours and slow to respond for 1.5 hours when an infrastructure upgrade involving Zookeeper and an autoscaler terminated many of their application servers in 16 seconds.
+#
+#
+
+AI-1:
+  # Since autoscaler reads from Zookeeper, we shut it off manually during the migration so it wouldn’t get confused about which servers should be available. It unexpectedly turned back on at 15:23PDT because our package management system noticed a manual change and reverted it. Autoscaler read the partially migrated Zookeeper data and terminated many of our application servers, which serve our website and API, and our caching servers, in 16 seconds. [..] Make our autoscaler less aggressive by putting limits to how many servers can be shut down at once.
+
+  experience: Autoscaler turned on (unexpectedly) and terminated many servers very quickly during migration
+  action: Limit how many servers can be shutdown at once
+  target: Autoscaler configuration
+  goal: Make autoscaler less aggressive (Limit damage that autoscaler can do in short time)
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: mitigate future
+  intended-effect: Safety / Operational constraint 
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability
+
+AI-2:
+  # Since autoscaler reads from Zookeeper, we shut it off manually during the migration so it wouldn’t get confused about which servers should be available. It unexpectedly turned back on at 15:23PDT because our package management system noticed a manual change and reverted it. [..] Improve our migration process by having two engineers pair during risky parts of migrations.
+
+  experience: Autoscaler turned on (unexpectedly) and terminated many servers very quickly during migration
+  action: Use two engineers during risky parts of migrations
+  target: Maintenance procedures (migration procedures)
+  goal: Ensure migration is performed more safely
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Process / Migration
+  intended-effect: Interaction Capability / User error protection
+  google-ai: prevent
+  
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # Since autoscaler reads from Zookeeper, we shut it off manually during the migration so it wouldn’t get confused about which servers should be available. It unexpectedly turned back on at 15:23PDT because our package management system noticed a manual change and reverted it. [..] Properly disable package management systems during migrations so they don’t affect systems unexpectedly.
+
+  experience: Autoscaler turned on (unexpectedly) because package management systems noticed and reverted the manual change
+  action: Disable package management systems during migrations
+  target: Package management system
+  goal: Prevent systems from affecting other systems unexpectedly
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract # during upgrades
+  sts: Tech / Infra
+  intended-effect: Interaction Capability / Operability
+  google-ai: prevent
+    
+  matrix-influence: likelihood
+  matrix-approach: vulnerability

@@ -1,0 +1,81 @@
+#
+# 2.yaml | Reddit
+# https://www.reddit.com/r/RedditEng/comments/o4y4dq/rwallstreetbets_incident_anthology_reddits_open/
+#
+# This report documents 2 incidents (both causing elevated error rates for users):
+#
+# (1) Subreddit Crowd Control. A subreddit feature (crowd control) was turned up for a busy (from posting and commenting) subreddit (wallstreetbets) and overloaded internal systems and causing database contention.
+#
+# (2) The Modmail Flood. A busy subreddit (wallstreetbets) went private increasing the load on the SSO and modmail features (from users wanting to contact moderators) over-saturating the underlying database and cascading to systems that shared that database.
+#
+
+AI-1:
+  # [The feature flip load-shedding was nonstandard but important...] Through these incidents, we’ve realized more clearly the value of feature flagging and identified several areas to reinforce the methodology - asking about feature switches early on in the design process, [.. AI-2, AI-3 ..]
+
+  experience: Responders disabled features in an ad-hoc fashion (temporary measures to disable, manually identifying lower importance features)
+  action: Include (more consistently) feature switches in early stages
+  target: Development practices (design)
+  goal: Encourage feature flags and feature-based load-shedding
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen # existing design process
+  sts: Process / Development methodology
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (consistency and to be used during incidents)
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-2:
+  # [The feature flip load-shedding was nonstandard but important...] Through these incidents, we’ve realized more clearly the value of feature flagging and identified several areas to reinforce the methodology - [.. AI-1 ..] making feature flags easier to code into systems [.. AI-2 ..]
+
+  experience: Responders disabled features in an ad-hoc fashion (temporary measures to disable, manually identifying lower importance features)
+  action: Make feature flags easier to code into systems
+  target: Development practices (VAGUE)
+  goal: More easily add feature flags to support feature-based load-shedding
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Process / Development methodology
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability (new feature)
+    - Maintainability / Modifiability
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CHANGED
+
+AI-3:
+  # [The feature flip load-shedding was nonstandard but important...] Through these incidents, we’ve realized more clearly the value of feature flagging and identified several areas to reinforce the methodology - [.. AI-1, AI-2 ..] and adding observability integrations to make identifying and auditing for feature flag flips easier in our production environments.
+
+  experience: Responders disabled features in an ad-hoc fashion (temporary measures to disable, manually identifying lower importance features)
+  action: Add monitoring and auditing for feature flags
+  target: Monitoring for application feature (observability integrations)
+  goal: Support feature flag observability
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add # current and future probably
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-4:
+  # [Moderator actions triggered both incidents and communication was necessary for triage and mitigation] Correlating subreddit behaviors to site impact proved critical in debugging both of these incidents, and the Community team played an important role, providing insights into user behavior and communication channels to moderators. None of Community’s key contributions were kicked off by documented processes - they happened because of organic relationships and internal connections built between individual responders from engineering and Community teams. While we were grateful for the openness that allowed these relationships to thrive, we’ve also started working to deliberately ensure that they continue to develop as we scale.
+
+  experience: Community team provided important insights into user behavior and communication channels to moderators in both incidents. 
+  action: Formalize user relationship development and communication (VAGUE)
+  target: Customer communication and engagement processes
+  goal: Maintain user communication channel as company grows (VAGUE)
+
+  lifecycle: Response / Diagnosis
+  action-type: evo / alter / strengthen # adhoc to formal
+  sts: Process / Customer communication (for engagement)
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability
+
+  matrix-influence: consequence # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

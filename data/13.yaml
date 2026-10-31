@@ -1,0 +1,79 @@
+#
+# 13.yaml | Honeycomb
+# https://www.honeycomb.io/blog/incident-review-you-cant-deploy-binaries-that-dont-exist/
+#
+# Gradual failure during 4 minutes then complete outage for 8 minutes. Root cause was bad code that was deployed (a regression where a system lost a feature, committed code that didn't compile passed review and made it to master branch, build artifacts were missing and got deployed anyway)
+#
+
+AI-1:
+  #  As part of that work, refactoring some code led to a regression where the buildevents tool lost a feature - passing through the exit code of the commands that it runs [...] The build artifact from the non-compiling code was missing one executable, and got deployed anyway [...] As we'd spent a large portion of our error budget during this outage, we first instituted a release freeze on the API server. Then, we conducted a retrospective to identify what we steps we'd need to take in order to unfreeze. As of today, we have added safeguards in several places to mitigate the chances that any of the steps above could cause a similar outage.
+
+  experience: Deployment related outage used up a large portion of error budget, to give time for retrospective
+  action: Institute release freeze
+  target: Deployment pipeline for API (automated)
+  goal: Prevent repeat incident until confidence restored
+
+  lifecycle: Pre-incident / Refactoring (build tools)
+  action-type: evo / subtract
+  sts: Process / Deployment process
+  google-ai: prevent
+  intended-effect: Safety / Operational constraint (confidence)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-3:
+  # Much of the speed at which we iterate and deploy code depends on trusting that our build system is protecting us from errors like this. It’s paramount that we retain this trust in order to be able to use automated deploy systems, so the first step was to fix the regression in our build instrumentation tool and work towards rebuilding the belief that if the build is green it’s okay to deploy.
+
+  experience: They deployed a latent (recent) regression (exit code handling) in the build instrumentation tool
+  action: Fix recent regression (fix exit-code handling for builds)
+  target: Deployment pipeline (build checks)
+  goal: Prevent deployment of non-compiling code (and build trust in "green")
+
+  lifecycle: Pre-incident / Refactoring (build tools)
+  action-type: evo / subtract
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect:
+    - Safety / Operational constraint (build system catches)
+    - Reliability / Faultlessness (trust that it is again)
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: vulnerability # CHANGED
+
+AI-4:
+  # We can add strength to the belief in our automated build system with real world use - we can both trust that the builds are reliable, and verify that it is indeed the case by health-checking tasks with automatic rollback, and staggering deploys by letting production lag our internal dogfooding cluster by a build. This is common practice and has long been on the list of things to do but not yet prioritized. Now it has happened.
+
+  experience: Unbuildable code deployed without sufficient checks ahead of time
+  action: Add health-checking tasks with automatic rollback
+  target: Health checking system for build pipeline
+  goal: Rollback bad builds that make it to production (trust and verify)
+
+  lifecycle: Failure / Inception # [TODO] Are these right?
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect: Safety / Operational constraint (trust deploys are good & rollback)
+    # - Reliability / Recoverability # CHANGED
+  # As of today we have added safeguards in several places... to mitigate ... could cause a similar outage
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+
+AI-5:
+  # We can add strength to the belief in our automated build system with real world use - we can both trust that the builds are reliable, and verify that it is indeed the case by health-checking tasks with automatic rollback, and staggering deploys by letting production lag our internal dogfooding cluster by a build. This is common practice and has long been on the list of things to do but not yet prioritized. Now it has happened.
+
+  experience: Unbuildable code deployed without sufficient checks ahead of time
+  action: Add staggering CI pipeline (use build internally before production)
+  target: Deployment system (CI)
+  goal: Use builds internally before moving to production (build trust)
+
+  lifecycle: Failure / Inception # [TODO] Are these right?
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Safety / Operational constraint
+
+  matrix-influence: likelihood # CONFIRMED
+  matrix-approach: capability # CONFIRMED
+

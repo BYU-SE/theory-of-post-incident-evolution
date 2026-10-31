@@ -1,0 +1,308 @@
+#
+# 9.yaml | Roblox
+# https://blog.roblox.com/2021/10/update-recent-service-outage/
+# https://blog.roblox.com/2022/01/roblox-return-to-service-10-28-10-31-2021/
+#
+# The Consul system became unhealthy causing a complete system outage because "when a Roblox service wants to talk to another service, it relies on Consul to have up-to-date knowledge of the location of the service it wants to talk to". "Consul was a single point of failure, and Consul was not healthy."
+#
+
+AI-1:
+  # Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] They had not observed this specific behavior before [despite testing] due to it manifesting from a combination of both a large number of streams and a high churn rate [...] The HashiCorp engineering team is creating new laboratory benchmarks to reproduce the specific contention issue and performing additional scale tests.
+
+  experience: Enabled a streaming feature (to improve efficiency) which had the opposite effect at scale, despite testing
+  action: Add "laboratory benchmarks to reproduce" & testing at scale
+  target: Test bench marks (third party laboratory)
+  goal: Reproduce specific contention issue
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Support # / Testing infrastructure
+  google-ai: prevent #/ reproduce and improve understanding of failure and conditions
+  intended-effect: Flexibility / Scalability (behavior at scale)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] HashiCorp is also working to improve the design of the streaming system to avoid contention under extreme load and ensure stable performance in such conditions.
+
+  experience: Enabled a streaming feature (to improve efficiency) which had the opposite effect at scale, despite testing
+  action: Improve subsystem design (for performance at scale)
+  target: Streaming feature or subsystem design (of Consul, a networking system)
+  goal: Stable performance and avoid contention under high load
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect:
+    - Flexibility / Scalability (stable at scale)
+    - Performance Efficiency / Time behavior (stable)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-3:
+  # [Due to BoltDB's handling of a never shrinking free list leading to] two-second Raft data writes and cluster consistency issues [...] HashiCorp and Roblox have developed and deployed a process using existing BoltDB tooling to “compact” the database, which resolved the performance issues.
+
+  experience: A specific usage pattern during the incident caused pathological performance issue and a massive increase in database size
+  action: Add new maintenance process (reducing storage space needed)
+  target: Datastore tooling (compressing DB)
+  goal: Avoid long data writes ("pathological performance issue")
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / add # "developed [...] a process"
+  sts: Tech / Support # They call it a process but its code
+  google-ai: mitigate future
+
+  intended-effect:
+    - Performance Efficiency / Resource utilization (space)
+    - Performance Efficiency / Time behavior (writes)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # Critical monitoring systems that would have provided better visibility into the cause of the outage relied on affected systems, such as Consul. This combination severely hampered the triage process [...] There was a circular dependency between our telemetry systems and Consul, which meant that when Consul was unhealthy, we lacked the telemetry data that would have made it easier for us to figure out what was wrong. We have removed this circular dependency. Our telemetry systems no longer depend on the systems that they are configured to monitor.
+
+  experience: There was a circular dependency between telemetry systems and the affected systems, and triage was made harder without telemetry data.
+  action: Decouple two systems (remove circular dependency)
+  target: Monitoring system and monitored cluster
+  goal: Improve visibility into the cause of outage
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+  action-type: evo / subtract # "removed this circular dependency"
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Fault tolerance (decouple & tolerance to hard dependency failure)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-5:
+  # Challenges in diagnosing these two primarily unrelated issues buried deep in the Consul implementation were largely responsible for the extended downtime [...] We have extended our telemetry systems to provide better visibility into Consul and BoltDB performance. We now receive highly targeted alerts if there are any signs that the system is approaching the state that caused this outage.
+
+  experience: Telemetry systems did not extend into where there the root causes were, nor provide early warning.
+  action: Add telemetry and alarming on error states ("extend system") into infrastructure systems
+  target: Metrics reporting and alarming (telemetry)
+  goal: Timely warning of approaching failure and better performance visibility
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+  action-type: evo / alter / strengthen # "extended our telemetry"
+  sts: Tech / Support
+  google-ai: detect / prevent #/ alerting (for approaching a known bad state)
+  intended-effect:
+    - Maintainability / Analysability
+    - Safety / Hazard warning
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-6:
+  # Challenges in diagnosing these two primarily unrelated issues buried deep in the Consul implementation were largely responsible for the extended downtime [...] We have also extended our telemetry systems to provide more visibility into the traffic patterns between Roblox services and Consul. This additional visibility into the behavior and performance of our system at multiple levels has already helped us during system upgrades and debugging sessions.
+
+  experience: Telemetry systems did not cover traffic patterns between services, limiting use during debugging
+  action: Add between system traffic patterns telemetry ("extend system")
+  target: Monitoring system and monitored cluster
+  goal: Visibility into behavior and performance (debugging)
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future #/ diagnosis (visibility)
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-7:
+  # A single Consul cluster supporting multiple workloads exacerbated the impact of these issues [...] Running all Roblox backend services on one Consul cluster left us exposed to an outage of this nature. We have already built out the servers and networking for an additional, geographically distinct data center that will host our backend services. We have efforts underway to move to multiple availability zones within these data centers; we have made major modifications to our engineering roadmap and our staffing plans in order to accelerate these efforts.
+
+  experience: One consul cluster supported multiple workloads (single point of failure)
+  action: "Efforts underway to move to multiple availability zones"
+  target: Backend services on Consul cluster in single AZ
+  goal: Move to multiple availability zones to reduce scope of impact
+
+  lifecycle: Pre-incident  # [TODO] Or also Failure / Triggering?
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent
+    #- Flexibility / Scalability
+  intended-effect: Reliability / Fault tolerance (redundancy)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-8:
+  # A single Consul cluster supporting multiple workloads exacerbated the impact of these issues [...] Running all Roblox backend services on one Consul cluster left us exposed to an outage of this nature. We have already built out the servers and networking for an additional, geographically distinct data center that will host our backend services. We have efforts underway to move to multiple availability zones within these data centers; we have made major modifications to our engineering roadmap and our staffing plans in order to accelerate these efforts.
+
+  experience: One consul cluster supported multiple workloads (single point of failure)
+  action: Modify engineering roadmap to accelerate move to multiple AZs
+  target: Backend services on Consul cluster in single AZ (roadmap)
+  goal: Complete existing effort more quickly (add AZs)
+
+  lifecycle: Pre-incident  # [TODO] Or also Failure / Triggering?
+  action-type: evo / alter / strengthen # "modifications to roadmap"
+  sts: Process / Engineering roadmap
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (redundancy)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-9:
+  # A single Consul cluster supporting multiple workloads exacerbated the impact of these issues [...] Running all Roblox backend services on one Consul cluster left us exposed to an outage of this nature. We have already built out the servers and networking for an additional, geographically distinct data center that will host our backend services. We have efforts underway to move to multiple availability zones within these data centers; we have made major modifications to our engineering roadmap and our staffing plans in order to accelerate these efforts.
+
+  experience: One consul cluster supported multiple workloads (single point of failure)
+  action: Modify staffing plans to accelerate move to multiple AZs
+  target: Backend services on Consul cluster in single AZ (staffing)
+  goal: Complete existing effort more quickly (add AZs)
+
+  lifecycle: Pre-incident  # [TODO] Or also Failure / Triggering?
+  action-type: evo / alter / strengthen # "modifications to [...] staffing plans"
+  sts: People / Organizational structure (staffing plans)
+  google-ai: prevent
+  intended-effect: Reliability / Fault tolerance (redundancy)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-10:
+  # Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] Roblox is still growing quickly, so even with multiple Consul clusters, we want to reduce the load we place on Consul. We have reviewed how our services use Consul’s KV store and health checks, and have split some critical services into their own dedicated clusters, reducing load on our central Consul cluster to a safer level.
+
+  experience: There was high load placed on Consul and they anticipate more load in the future due to growth (similar)
+  action: Partition service and load (split into dedicated clusters)
+  target: Storage subsystem and clients ("Consul's KV store")
+  goal: Reduce current load and provide headroom for future growth
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen # headroom
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-11:
+  # Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] Some core Roblox services are using Consul’s KV store directly as a convenient place to store data, even though we have other storage systems that are likely more appropriate. We are in the process of migrating this data to a more appropriate storage system. Once complete, this will also reduce load on Consul.
+
+  experience: There was high load placed on Consul and they anticipate more load in the future due to growth (similar)
+  action: Move some data to a more appropriate storage system
+  target: Distributed datastore (KV store)
+  goal: Reduce current load on Consul (to support future growth)
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen # headroom
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Capacity (space and load)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-12:
+  # Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] We discovered a large amount of obsolete KV data. Deleting this obsolete data improved Consul performance.
+
+  experience: There was high load placed on Consul and they anticipate more load in the future due to growth (similar)
+  action: Delete obsolete data
+  target: Distributed datastore data (KV store)
+  goal: Improve performance (reduce latency?)
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract # "deleting this obsolete data"
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Time behavior
+    - Performance Efficiency / Resource utilization (space)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-13:
+  # [Due to its handling of a never shrinking free list leading to] two-second Raft data writes and cluster consistency issues [...] We are working closely with HashiCorp to deploy a new version of Consul that replaces BoltDB with a successor called bbolt that does not have the same issue with unbounded freelist growth. We intentionally postponed this effort into the new year to avoid a complex upgrade during our peak end-of-year traffic. The upgrade is being tested now and will complete in Q1.
+
+  experience: A specific usage pattern during the incident caused pathological performance issue and a massive increase in database size
+  action: Upgrade to new version of system (replacing database subsystem)
+  target: Distributed datastore (KV store) version
+  goal: Fix (high load) performance issue
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken # removing issue
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Resource utilization (space)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-14:
+  # The return to service effort was slowed by a number of factors, including the deployment and warming of caches needed by Roblox services. We are developing new tools and processes to make this process more automated and less error-prone.  In particular, we have redesigned our cache deployment mechanisms to ensure we can quickly bring up our cache system from a standing start. Implementation of this is underway. [I would love to know more ...]
+
+  experience: The cache redeployment process ran into a series of issues, including incorrect scheduling data, unhealthy nodes, design of tool for a particular use case that was not for this return to recovery
+  action: Automate cache deployment mechanism (redesign)
+  target: Cache tooling & processes / Deployment and warm up
+  goal: Quick cache deployment
+
+  lifecycle:
+    - Failure / Downstream Effects
+    - Failure / Recovery
+  action-type: evo / alter / strengthen 
+  sts: Tech / Core
+  google-ai: mitigate future #/ decrease duration
+  intended-effect:
+    - Reliability / Recoverability
+    - Interaction Capability / Operability ("less error-prone")
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-15:
+  # We were thoughtful and careful in our approach to bringing Roblox up from an extended fully-down state, which also took notable time [...] We worked with HashiCorp to identify several Nomad enhancements that will make it easier for us to turn up large jobs after a long period of unavailability. These enhancements will be deployed as part of our next Nomad upgrade, scheduled for later this month.
+
+  experience: Hard to turn up large jobs after periods of unavailability
+  action: Identify and develop recovery enhancements (VAGUE)
+  target: Work scheduling tool version (Nomad)
+  goal: Easily restart jobs (after period of unavailability)
+
+  lifecycle:
+    - Failure / Recovery # [TODO] Was it a human aspect that made it hard to turn up large jobs?
+    - Response / Mitigation # [TODO] Was it a human aspect that made it hard to turn up large jobs?
+  action-type:
+    - formative / discover options
+    - evo / alter / strengthen # "enhancements"
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-16:
+  # The root cause was due to two issues. Enabling a relatively new streaming feature on Consul under unusually high read and write load led to excessive contention and poor performance [...] We originally deployed streaming to lower the CPU usage and network bandwidth of the Consul cluster. Once a new implementation has been tested at our scale with our workload, we expect to carefully reintroduce it to our systems.
+
+  experience: Enabled a streaming feature (to improve efficiency) which had the opposite effect at scale, despite testing
+  action: Carefully reintroduce feature to systems
+  target: Streaming feature or subsystem design (of Consul, a networking system)
+  goal: Reintroduce feature ("carefully") consuming fewer resources
+
+  lifecycle: Failure / Inception
+  action-type: evo / add #/ reintroduce # "carefully reintroduce"
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization (cpu and network)
+    - Flexibility / Scalability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

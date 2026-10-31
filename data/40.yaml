@@ -1,0 +1,75 @@
+#
+# 40.yaml | Venafi
+# https://venafi.com/blog/gke-webhook-outage/
+#
+#  A misconfiguration of an Kubernetes integration caused intermittent timeouts in the deploy pipeline, and eventually an indiscriminate loss of service for all customers but it was a testing platform.
+
+AI-1:
+  # Since then, we have configured our ValidatingAdmissionWebhook for OPA to only monitor the namespaces where policy is applicable and development teams have access. We have also only enabled the webhook for Ingress and Service resources, the only resources validated by our policy.
+
+  experience: Activation check also depended upon a dependency, which was unhealthy and system required all to pass admission webhook (could not report node health, though nodes were healthy)
+  action: Monitor only namespaces where needed
+  target: Health checking system for deployments (webhooks)
+  goal: Don't do unnecessary healthchecks
+
+  lifecycle: Failure / Downstream Effects # CHANGED
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: mitigate future # CHANGED
+  intended-effect:
+    - Safety / Fail safe (resolving health check issues) 
+    - Reliability / Faultlessness
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-2:
+  # Since we first deployed OPA, the documentation has been updated to reflect this change.
+
+  experience: UNCLEAR
+  action: Update (VAGUE)
+  target: Health checking system for deployments (documentation)
+  goal: Keep documentation up to date
+
+  action-type: evo / alter / strengthen
+  sts: Process / Third-party documentation
+  google-ai: prevent
+  intended-effect: Interaction Capability / Operability (good documentation)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # We have also added a liveness probe to ensure OPA is restarted when it becomes unresponsive and [continued below ...]
+
+  experience: Dependent service (OPA) was unresponsive preventing upgrade to complete 
+  action: Add liveness probe with auto-restart action
+  target: Health checking system for 3rd-party plugins
+  goal: Ensure plugin restarts when unresponsive
+
+  lifecycle: Response / Mitigation # CHANGED
+  action-type: evo / add
+  sts: Tech / Infra
+  google-ai: mitigate future # CHANGED
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-4:
+  # [... continued from above] have updated the documentation.
+
+  experience: Dependent service (OPA) was unresponsive preventing upgrade to complete 
+  action: Document a completed change (see AI-3)
+  target: Health checking system for 3rd-party plugins
+  goal: Document process that ensures plugin restarts when unresponsive
+
+  lifecycle: Response / Mitigation # CHANGED
+  action-type: evo / alter / strengthen
+  sts: Process / Third-party documentation
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (documentation for 3rd parties)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

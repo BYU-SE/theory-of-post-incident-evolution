@@ -1,0 +1,92 @@
+#
+# 75.yaml | Chef
+# https://www.chef.io/blog/2014/07/10/supermarket-intermittent-unresponsiveness-postmortem/
+#
+# Details: https://gist.github.com/cwebberOps/402f60e32a80fab3e6de
+
+AI-1: 
+  # Change the behavior of the Berkshelf API Servers, to use the new /universe endpoint. (Berkshelf Core Team)
+
+  experience: UNCLEAR
+  action: Migrate service to new endpoint (service)
+  target: API services & (new) end point
+  goal: UNCLEAR
+
+  action-type: evo / UNCLEAR
+  sts: Tech / Core
+  intended-effect: UNCLEAR
+  google-ai: UNCLEAR
+
+  matrix-influence: unspecified
+  matrix-approach: unspecified
+
+AI-2: 
+  # Adjust the number of unicorn workers on each node as necessary. (Joshua Timberman)
+
+  experience: Service was overloaded at launch (no load testing), there was a mismatch between the number of unicorn workers and number of cores on each machine
+  action: Reconfigure number of workers per server
+  target: HTTP server configuration
+  goal: Efficiently handle load
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  intended-effect: Performance Efficiency / Capacity
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3: 
+  # Improve performance with the way downloads are handled. This will include ensure that the metrics collection is non-blocking. (Christopher Webber and Full Stack)
+
+  experience: Service was overloaded at launch (no load testing), there was a mismatch between the number of unicorn workers and number of cores on each machine
+  action: Reduce cost of metrics collection
+  target: Monitoring and metrics system 
+  goal: Efficiently handle load
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  intended-effect: Performance Efficiency / Time behavior (nonblocking)
+  google-ai: prevent
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4: 
+  # Get updates from http://status.getchef.com into #chef on irc.freenode.net. (Christopher Webber)
+
+  experience: UNCLEAR
+  action: Route status updates to IRC channel
+  target: Customer communication systems
+  goal: Streamline/refine (customer communication)
+
+  action-type: evo / add
+  sts: Process / Customer communication (status updates)
+  intended-effect: Interaction Capability / User assistance (more channels)
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5: 
+  # The health check timeouts were set too low to be effective. We ended up in a state where nodes were being taken out of the pool causing a domino effect. As one node would be pulled out, the other nodes would see a significant increase in traffic, causing them to time out and fall out of the pool.
+
+  # Add additional alerting around nodes falling out of the ELB. (Chef Operations)
+
+  experience: Health checks removed healthy nodes since their timeouts were too short
+  action: Monitoring for nodes being removed from ELB
+  target: Alarming system 
+  goal: Quickly catch node removals (so responders can remedy)
+    
+  lifecycle: Failure / Downstream Effects 
+  action-type: evo / add
+  sts: Tech / Support
+  intended-effect: 
+    - Reliability / Availability
+    - Reliability / Fault tolerance 
+  google-ai: mitigate future
+
+  matrix-influence: consequence
+  matrix-approach: capability

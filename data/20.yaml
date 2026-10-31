@@ -1,0 +1,82 @@
+#
+# 20.yaml | Monzo
+# https://monzo.com/blog/2019/09/08/why-monzo-wasnt-working-on-july-29th
+#
+# Scaling up their Cassandra cluster (initially 21 servers, adding 6) triggered a bunch of failures across their systems (routing, customer support, configuration, ...). The new servers joined the cluster (taking responsibility for some keys) before the data had been streamed to it (which showed up as missing data for some queries).
+#
+
+AI-1:
+  # [Production configuration of Cassandra cluster meant that] The new servers had joined the cluster, assumed responsibility for some parts of the data (certain partition keys to balance the load), but hadn't yet streamed it over [...] We've already fixed our use of auto_bootstrap.
+
+  experience: When new servers joined the cluster, a latent configuration defect (misunderstood) meant that they did not get data yet before taking responsibility
+  action: Change misunderstood setting controlling behavior of new nodes 
+  target: Distributed datastore (Cassandra cluster)
+  goal: Safe scale-up operations
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection (safe addition of instances)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-2:
+  # [Continuing from above] And we've also reviewed and documented all our decisions around the other Cassandra settings. This means we have more extensive runbooks – the operational guides we use to provide step-by-step plans on performing operations such as a scale up or a restart of Cassandra. This'll help fill the gaps in our knowledge, and make sure that knowledge is spread to all our engineers.
+
+  experience: When new servers joined the cluster, a latent configuration defect (misunderstood) meant that they did not get data yet before taking responsibility
+  action: Review and document all settings decisions
+  target: Maintenance procedures (runbooks for Cassandra operations)
+  goal: Increase operational safety, fill knowledge gaps, spread knowledge
+
+  lifecycle: Failure / Inception
+  action-type:
+    - formative / check
+    - evo / add
+  sts: Process / Operational documentation (runbooks and guides)
+  google-ai: prevent
+  intended-effect: Interaction Capability / User error protection (create expertise)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-3:
+  # We discuss whether the scale-up activity could have caused the issue, but discount the possibility as everything appears healthy [...] Another key issue that delayed our actions was the lack of metrics showing Cassandra as a primary cause of the issue. So we're also looking at exposing more metrics and adding potential alerting for strong shifts in metrics like 'row not found'.
+
+  experience: Metrics did not point to database as cause of issue, delaying action
+  action: Look into exposing more metrics and alerting (on strong shifts)
+  target: Metrics reporting from distributed data store
+  goal: More quickly identify problems (better visibility)
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+  action-type: 
+    - evo / alter / strengthen
+    - formative / discover options
+  sts: Tech / Support
+  google-ai: mitigate future #/ avoid misdirection (add better metrics)
+  intended-effect:
+    - Maintainability / Analysability
+    - Safety / Hazard warning
+
+  matrix-influence: consequence
+  matrix-approach: capability 
+
+AI-4:
+  #  At the time you might not have been able to log into the app, send and receive payments or withdraw money [...] get in touch with [...] We'll split our single Cassandra cluster into smaller ones to reduce the impact one change can have [...] We’d like to reduce the likelihood that any single activity can impact more than one area of Monzo [and] we believe this would have been a much less complex issue to deal with. [..] In the long term, we plan to split up our single large cluster into multiple smaller ones [AND the reason this is long-term] We want to make sure we get it right though; doing it in such a way that doesn't introduce too much operational complexity, or slow our engineers down at releasing new features to customers.
+
+  experience: Maintenance action involved scaling the single cluster architecture (a risky action since it can wide effects)
+  action: Split cluster into multiple clusters (based on client services)
+  target: Distributed datastore architecture (and associated services)
+  goal: 1) Reduce impact of single issue, 2) Simplify triage and mitigation, 3) Safer operation at scale
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (split for redundancy & isolation to limit impact)
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability

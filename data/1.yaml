@@ -1,0 +1,78 @@
+#
+# 1.yaml | Coinbase
+# https://blog.coinbase.com/incident-post-mortem-june-1-2020-1cff2e51fa64
+#
+# Description: IN connection with a price spike of BTC, the service experienced a 5x traffic spike over 4 minutes and autoscaling was unable to keep pace, leading to an outage on their website and mobile apps.
+#
+
+AI-1:
+  # The health check is also served by these saturated processes, which caused some instances to be marked as unhealthy and taken out of the load balancer, further exacerbating this issue. We have since fixed the health endpoint to ensure that saturated instances don’t get taken out of rotation. 
+
+  experience: Health checks were served by saturated processes and failed, removing instances
+  action: Fix health checking logic (VAGUE)
+  target: Health checking system for load balancer 
+  goal: Correctly assess the health of instances to avoid taking instances out when saturated
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / subtract
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Fault tolerance 
+    - Reliability / Faultlessness
+    - Reliability / Availability
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability
+
+AI-2:
+  experience: Autoscaling couldn't scale up fast enough with traffic spike
+  action: Add caching
+  target: Cache system on services (new, protect against spikes)
+  goal: Reduce the impact of price-related traffic spikes
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization
+    - Flexibility / Scalability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  experience: Autoscaling couldn't scale up fast enough with traffic spike
+  action: Pre-scale before predictable surges
+  target: Fleet infrastructure (scaling servers)
+  goal: Scale more quickly in the face of traffic spikes
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-4:
+  # In an effort to mitigate the saturation, we redeployed the API at 16:20 PDT to increase the machines serving the traffic. Once this deploy completed, the previous deploy’s instances were taken out of rotation, leading to another 2 minute outage due to instances saturating and being marked unhealthy. This was handled automatically by our autoscaling. Longer term we’re planning to improve our deployment process to mitigate some of the autoscaling issues we experienced.
+
+  experience: Autoscaling takes old instances out of rotation at a rate which can saturate remaining processes (leading to poor health check consequences)
+  action: Improve (VAGUE)
+  target: Deployment process
+  goal: Mitigate the autoscaling issues (VAGUE)
+
+  lifecycle: Failure / Recovery
+  action-type: evo / alter / weaken
+  sts: Tech / Infra
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Faultlessness 
+    - Reliability / Availability
+    - Flexibility / Scalability
+
+  matrix-influence: consequence
+  matrix-approach: vulnerability

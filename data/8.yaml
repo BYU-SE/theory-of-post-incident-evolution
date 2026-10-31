@@ -1,0 +1,64 @@
+#
+# 8.yaml | Zalando
+# https://github.com/zalando-incubator/kubernetes-on-aws/blob/dev/docs/postmortems/jan-2019-dns-outage.md
+#
+# Timeouts from a downstream service (fronted by an aggregation layer) lead to client retries, increasing RPS for the aggregation layer and the Kubernetes cluster DNS infrastructure. The spike in DNS queries led to OOM errors on the "CoreDNS pods" which killed them. They could not recover ("kept running out of memory and getting killed") leading to a total DNS outage for the entire cluster.
+#
+
+AI-1:
+  # [Non optimal DNS infrastructure across the system ...] (1) The aggregation layer service [...] doesn’t cache any DNS lookups [...] (2) The application [sends] 10 DNS queries for every single DNS lookup of an cluster-external name [... 5 problem in Kubernetes] (3) Short maximum lifetime for all connections [and so] a larger number of DNS requests due to constantly opening new connections to downstream dependencies. (4) CoreDNS pods were configured with a very small memory limit of 100Mi based on historical resource usage data. Introduce a more resilient DNS infrastructure. We are working on a solution where we will run CoreDNS fronted by dnsmasq on every node. This setup outperforms any other setup we have considered and tested. We will share a longer write-up of this, once we have some more experience with the new setup.
+
+  experience: A spike in requests when downstream service timed out and retried, also led to a spike in DNS queries with x10 amplification, resulting in the DNS infrastructure OOM and getting killed and total DNS outage.
+  action: Add new subsystem for DNS caching ("dnsmasq")
+  target: Cache for DNS on every app node (new)
+  goal: "More resilient DNS infrastructure"
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Infra
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization
+    - Reliability / Faultlessness (avoid activating defect)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # As a side effect of the DNS outage our internal monitoring for the cluster was also completely down as it needs to talk to external services to trigger alerts and push metrics [...] Improve high level alerting from outside of clusters. We should know that there is something wrong with the cluster before, or at least at the same time as applications in the clusters start to be affected.
+
+  experience: Internal monitoring for cluster failed when the DNS outage occurred, delaying notifying the on-call engineer.
+  action: UNKNOWN (maybe add external monitoring and alarming)
+  target: Monitoring and alarming infrastructure (external)
+  goal: "Improve high level alerting from outside of clusters"
+
+  lifecycle: Response / Detection
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: detect / prevent #/ alerting (make it work even during an incident)
+  intended-effect:
+    - Maintainability / Analysability (timeliness)
+    - Safety / Hazard warning
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  # The on-call engineer for the aggregation layer service had to call the Kubernetes responsible on-call engineer instead of the automatic paging we normally rely on [...] Improve incident response processes and tooling. It can happen that automatic paging fails for whatever reason. In this case it should be simple for any on-call engineers to escalate directly to other teams without going to a different tool. One idea we are pursuing is to simplify the escalation process via a chat bot.
+
+  experience: The on-call engineer (for another service) had to manually page the responsible engineer since the monitoring was impacted by the DNS outage
+  action: Add tool to make escalating (notifying) simple for on-call
+  target: Alarming and paging tooling (escalation process)
+  goal: Quick and easy escalation to responsible parties
+
+  lifecycle: Response / Triage
+  action-type: evo / add
+  sts:
+    - Process / Incident response / Escalation process
+    - Tech / Support
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability (access to expertise)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

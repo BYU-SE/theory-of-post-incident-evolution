@@ -1,0 +1,60 @@
+#
+# 39.yaml | Google
+# https://static.googleusercontent.com/media/www.google.com/en//appsstatus/ir/ti76kvgai1yqajx.pdf
+#
+# Google Chat experienced degraded service (increased in error, slow loading of rooms, no typing indicator) due to a preprocessor of chat messages being configured with the wrong access credentials. As a result, a postprocessor which depended upon the results of that preprocessor, then spawned threads and caused a deadlock condition, in attempting to fetch the results itself.
+# 
+
+AI-1:
+  # [The failure involved a new thread attempting to retrieve a value in a way that a deadlock condition was reached. We are] Adjusting the automated alerting system to improve the detection of lock contention issues
+
+  experience: Deadlock on failure scenario (cache miss+load failure)
+  action: UNCLEAR ("Adjust the system")
+  target: Alarming and monitoring system
+  goal: Allow lock contention issues to be more easily detected
+
+  lifecycle: Response / Detection
+  action-type: evo / alter / strengthen
+  sts: Tech / Support
+  google-ai: detect / mitigate 
+  intended-effect: Safety / Hazard warning
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-2:
+  # [The failure involved a new thread attempting to retrieve a value in a way that a deadlock condition was reached. We are] Increasing the number of threads available to Google Chat backend services in order to reduce the potential impact of lock contention events
+
+  experience: Deadlock on failure scenario (cache miss+load failure) resulted in thread lock contention affecting other backend tasks
+  action: Increase the number of threads that services can use
+  target: Chat postprocessor service configuration
+  goal: Reduce the potential impact of lock contention events
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability
+
+AI-3:
+  # During the investigation of the issue - the Engineering team identified an increase in lock contention within the backend binaries since the deployment of the latest release and subsequently [...] Defining new testing which triggers this particular code path and identify this issue before reaching production.
+
+  experience: Newly deployed code hit a deadlock condition (when a cache value missing)
+  action: Add new tests that triggers the code path in incident
+  target: Test suite
+  goal: Reproduce specific preprocessor aborting issue (to ensure coverage)
+
+  lifecycle: Pre-incident / Introducing latent issue
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Performance Efficiency / Resource utilization ("deadlock")
+    - Reliability / Faultlessness (catch before production)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability
+

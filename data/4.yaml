@@ -1,0 +1,67 @@
+#
+# 4.yaml | Asana
+# https://blog.asana.com/2016/09/yesterdays-outage/
+# https://asana.com/inside-asana/yesterdays-outage
+#
+# A later (in the day) than usual deployment of code that "had a bug, which resulted in the logging being triggered dramatically more often than we had anticipated" increasing CPU utilization which (when combined with morning peak traffic) increased latency and longer DB connections
+#
+
+AI-1:
+  # We had sufficient headroom that the CPU increase didn’t cause any problems, allowing the issue to go unnoticed on Wednesday night [and when incident began] Asana was still up [...] We identified systems and procedures that we can improve in three main areas: [1] detecting problems before they become user facing.
+
+  experience: Deployment of defect, which went unnoticed for a long time (headroom obscured CPU increase)
+  action: UNCLEAR
+  target: Metrics reporting systems (VAGUE)
+  goal: Detect "problems before they become user facing"
+
+  lifecycle: Response / Detection
+  action-type: evo / alter / strengthen 
+  sts:
+    - Tech / UNCLEAR
+    - Process / UNCLEAR
+  google-ai: detect / prevent
+  intended-effect: Maintainability / Analysability
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # One of the engineers noticed the increased logging on the web servers, but discarded this line of investigation, since it didn’t match the hypotheses that were being explored [...] We identified systems and procedures that we can improve in three main areas: [2] reducing the amount of time required for on-call engineers to triage incidents [continued below ...]
+
+  experience: Mistakes led to delays in triage
+  action: UNCLEAR
+  target: Incident response systems and procedures for triage
+  goal: Reduce time to triage (for on-call engineers)
+
+  lifecycle:
+    - Response / Triage
+    - Response / Diagnosis
+  action-type: evo / alter / strengthen
+  sts:
+    - Tech / UNCLEAR
+    - Process / UNCLEAR
+  google-ai: mitigate future
+  intended-effect: Maintainability / Analysability (triaging time)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # Between 08:08am and 08:29am we tried to identify a safe version of the code that we could revert to. We had a recent set of reverts the day before, so had we just picked the previous revision, we would have ended up with bad code [...] We identified systems and procedures that we can improve in three main areas: [3] reducing the amount of time to fix problems once they have been identified.
+
+  experience: Multiple previous reverts complicated recovery
+  action: UNCLEAR
+  target: Incident response procedures
+  goal: Reduce time to fix issue after identification
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts:
+    - Tech / UNCLEAR
+    - Process / UNCLEAR
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

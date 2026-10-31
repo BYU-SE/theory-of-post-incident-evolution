@@ -1,0 +1,134 @@
+#
+# 21.yaml | Bungie (Destiny 2 game)
+# https://www.bungie.net/7/en/News/Article/48723
+#
+# A hotfix re-introduced a previously fixed defect (causing errors for some player accounts) because servers crashed and restarted WITHOUT picking up the fix. Responders rolled back the hotfix and rolled back the accounts to previous state.
+#
+
+AI-1:
+  # [Many servers crashed during rollout of hotfix, were manually restarted and did NOT pick up the patch fixing a previous defect...] We have verification systems that detect these sorts of version misconfigurations, but the crashes and subsequent manual restarts caused the servers to also skip the verification process [...] We have added further safeguards to our process for “hot-patching” our servers to ensure that they cannot start with an unexpected version.
+
+  experience: During deployment, servers crashed and when manually restarted they did not start with the correct version because of a defect
+  action: Add additional safeguards (VAGUE)
+  target: Deployment process for hot-patches and start up
+  goal: Prevent restart with "unexpected version"
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Process / Deployment procedures # This may be Tech / * if process refers to the deployment mechanisms rather than a procedure as we are considering the other procedures
+  google-ai: prevent
+  intended-effect: Safety / Operational constraint
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-2:
+  # A small percentage (less than 1 percent) of these servers would crash on start-up due to the volume of servers overwhelming one of the backing databases [...] We have fixed the issue that caused a small fraction of WorldServers to crash on startup. This fix will be deployed with Season 10.
+
+  experience: A small percent of servers crashed on deploy and start-up
+  action: Fix issue caused by large volume of server starting up (VAGUE)
+  target: Game play service (worldserver) startup
+  goal: Prevent server crashes on restart of fleet
+
+  lifecycle: Failure / Inception
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Flexibility / Scalability
+    - Reliability / Faultlessness (on startup)
+
+  matrix-influence: likelihood 
+  matrix-approach: vulnerability
+
+AI-3:
+  # [Previous temporary fix was a patch that was not picked up after restart of servers...] The permanent fix for character corruption will be rolled into the next update as an executable change, removing the need for the configuration override.
+
+  experience: A temporary patch was deployed (involved in the crash)
+  action: Deploy permanent (executable) fix & remove temp (config) fix
+  target: Game play service (worldserver) source
+  goal: Remove need for temporary fix
+
+  lifecycle: Failure / Inception # Seems initially unrelated, but is the patch involved in the trigger though not the trigger itself
+  action-type: evo / subtract
+  sts: Tech / Core
+  google-ai: prevent #/ replace temporary fix with permanent
+  intended-effect:
+    - Safety / Operational constraint
+    - Reliability / Faultlessness (data integrity permanent fix)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-4:
+  # [Rollout of hotfix triggered the event and the response required rolling back system state] Looking ahead, we are investigating ways to speed up our rollback and recovery mechanisms.
+
+  experience: Deployment of a hot-patch and subsequent failure required rolling back system state
+  action: Investigate options for speeding up operation
+  target: Incident response mechanisms for rollback and recovery
+  goal: Speed up incident response mechanisms
+
+  lifecycle: Failure / Recovery
+  action-type: 
+    - evo / alter / strengthen
+    - formative / discover options
+  sts: Process / Incident response / Rollback and recovery mechanisms
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability (timely)
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5:
+  # [Crash and manual restart caused the servers to skip loading the configuration and] also skip the verification process [...] This meant that a small percentage of WorldServers were running the old code and the bug that was corrupting character data [...] In a future release, we will address the issue that can cause servers to skip loading configuration data.
+
+  experience: During deployment, servers crashed and when manually restarted they did not start with the correct version because of a defect
+  action: Fix defect with loading configuration
+  target: Deployment process for hot-patches and start up
+  goal: Prevent restart with "unexpected version"
+
+  lifecycle: Failure / Inception
+  action-type: evo / alter / weaken
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect:
+    - Interaction Capability / Operability
+    - Reliability / Faultlessness
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability
+
+AI-6:
+  # Several months ago, players reported that quest log sorting wasn’t working properly, and we wanted to fix that [...] That fix was conceptually reasonable but, through subtle side effects, it ended up disabling too much of the clean-up process [...] We will also add more protections to the login-account clean-up code, to help prevent future bugs from being introduced into such a critical area.
+
+  experience: Earlier patch disabled clean-up process
+  action: Add more protections (VAGUE)
+  target: Game play service (worldserver) source ("critical area")
+  goal: Prevent future bugs from being introduced
+
+  lifecycle: Pre-incident # [TODO] Check
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Maintainability / Modifiability (prevent new bugs)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-7:
+  # [Continuing from above the change was missed despite ...] (1) we had two domain experts provide code reviews for the change – but sadly, we didn’t spot the bug (2) we do comprehensive stress testing to try and model user behavior and its impact on our service architecture. (3) we also have our test teams log in with a number of test accounts in order to verify the player experience [they] gave the all clear. (4) Because there’s no substitute for millions of real player behaviors, we supplement this testing by closely monitoring service metrics after launch. We are updating our development methodologies to catch issues like this earlier in the release pipeline.
+
+  experience: Earlier patch disabled clean-up process, despite two domain experts provide code reviews for the change
+  action: Update methodologies (VAGUE)
+  target: Development practices (possibly end to end)
+  goal: Catch issues like this earlier in the release pipeline
+
+  lifecycle: Pre-incident
+  action-type: evo / alter / strengthen
+  sts: Process / Development methodology
+  google-ai: prevent #/ catch before software release
+  intended-effect: Reliability / Faultlessness (catch early)
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

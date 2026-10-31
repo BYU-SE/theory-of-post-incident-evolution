@@ -1,0 +1,24 @@
+#
+# 57.yaml | Zerodha
+# https://zerodha.com/marketintel/bulletin/105569/postmortem-trading-and-hanging-orders-on-12th-april-2018
+#
+# A network connection failed, and a backup connection began to go up and down over the next hour affecting customers.
+# 
+
+AI-1:
+  # The issue when this happens though is with bracket and cover orders (BO, CO). In a bracket and cover order, there are counter leg square off orders which never gets placed when the primary orders are lapsed. What this means is a hanging BO/CO position which can’t be exited in the normal way. We advise clients to take opposite position using MIS/NRML when this happens if they intend to exit such hanging position. [.. So] We have a new release by end of this month where bracket and cover orders will have an option to exit from open position itself. Currently the exit option shows up only on the counter leg open orders. So even if you don’t see a counter leg open order, you can exit the BO/CO position from admin position directly.
+
+  experience: After network failures, customer's trading was left in a "hanging position"
+  action: Add option to software to allow customers to handle edge cases
+  target: Financial service (customer feature)
+  goal: Reduce manual effort (by customers) needed after an incident
+
+  lifecycle: Failure / Downstream Effects # on customer
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / User assistance # TODO: or is this functionality?
+
+  matrix-influence: consequence
+  matrix-approach: capability
+

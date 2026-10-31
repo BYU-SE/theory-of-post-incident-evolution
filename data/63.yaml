@@ -1,0 +1,283 @@
+#
+# 63.yaml | Gitlab
+# https://about.gitlab.com/blog/2017/02/10/postmortem-of-database-outage-of-january-31/
+#
+# Improving recovery procedures
+#
+
+AI-1: 
+  # Update PS1 across all hosts to more clearly differentiate between hosts and environments (#1094)
+
+  experience: Accidental deletion of data (Manual action) because wrong configuration for PS1 when script was run, when investigating ways to distribute increased load
+  action: Update host primary prompts (PS1) to differentiate environments
+  target: Hosts shells (terminals)
+  goal: Avoid human errors (more clear)
+
+  lifecycle: Failure / Downstream Effects
+  action-type: evo / alter / strengthen
+  sts: Tech / Infra
+  google-ai: prevent 
+  intended-effect: Interaction Capability / User error protection
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-2:
+  # Prometheus monitoring for backups (#1095)
+
+  experience: After accidental data deletion, engineers found that some backups had been failing and notifications about those failures were not reaching responders.
+  action: Add monitoring for backup process (missing backups, etc)
+  target: Monitoring for database backups
+  goal: Ensure availability of backups for disaster recovery
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-3:
+  # Set PostgreSQL's max_connections to a sane value (#1096) [...] We should find historical data to see what our peaks are (besides the 800 I found in the last week), and figure out what a sane default is. We also need to find out why this was working for almost a year, only to fail now.
+
+  experience: A configuration value was set to a very high value, and caused issues during mitigation relating to creating too many semaphores
+  action: Investigate and correct max connections configuration 
+  target: Database configuration
+  goal: Ensure database server can (re) start
+
+  lifecycle: Response / Mitigation
+  action-type:
+    - formative / investigative # historical data
+    - evo / alter / weaken
+  sts: Tech / Core 
+  google-ai:
+    - investigate
+    - mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability
+
+AI-4:
+  # Investigate Point in time recovery & continuous archiving for PostgreSQL (#1097) [...] We're also looking into ways to build better recovery procedures for the entire [...] infrastructure
+
+  experience: Recovery snapshot used was 6 hours old
+  action: Introduce new disaster recovery procedures and tools
+  target: Database recovery procedures
+  goal: More efficient disaster recovery 
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type: evo / add
+  sts: Process / Disaster database recovery
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-5:
+  # Hourly LVM snapshots of the production databases (#1098)
+
+  experience: Recovery snapshot used was 6 hours old
+  action: More frequent (file system level) backup
+  target: Database backup processes (snapshots)
+  goal: Database disaster recovery (quicker option)
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type: evo / alter / strengthen
+  sts: Process / Disaster database recovery
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-6:
+  # Azure disk snapshots of production databases (#1099) [...] During today's outage it was revealed that Azure disk snapshots are disabled for our production databases. These should be enabled and run, if possible, at least once per hour.
+
+  experience: Recovery snapshot used was 6 hours old
+  action: Enable (disk level) database snapshots
+  target: Database backup infrastructure (disk based snapshots)
+  goal: Add disaster recovery redundancy
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type: evo / add
+  sts: Process / Disaster database recovery
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-7:
+  # Move staging to the [Azure Resource Manager] environment (#1100) [...] This ensures we have faster disks, making it easier to restore production from staging data. 
+
+  experience: Backup took a long time since it was in a different region
+  action: Move staging environment
+  target: Database backup infrastructure (staging data)
+  goal: Make disaster recovery option more efficient
+
+  lifecycle:
+    - Response / Mitigation
+    - Failure / Recovery
+  action-type: evo / alter / strengthen
+  sts: Infrastructure / Environment
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-8:
+  # Recover production replica(s) (#1101) [...] Our production replica db2.cluster.gitlab.com is currently offline/not working, so we need to set it up again. Ideally we also set up another replica so we at least have 2, instead of 1
+
+  experience: Data loss occurred during incident and production replica is currently not working
+  action: Fix database replication (off line atm)
+  target: Database replication (replica offline atm)
+  goal: Restore database redundancy
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Tech / Core
+  google-ai:
+    - mitigate this
+    - repair
+  intended-effect: Reliability / Fault tolerance
+
+  matrix-influence: unrelated
+  matrix-approach: unrelated
+
+AI-9:
+  # Automated testing of recovering PostgreSQL database backups (#1102)
+
+  experience: After accidental data deletion, engineers found that some backups had been failing and notifications about those failures were not reaching responders.
+  action: Add automated test for database recovery 
+  target: Testing practices for database recovery
+  goal: Prevent data loss (and automate process)
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect:
+    - Reliability / Recoverability
+    - Reliability / Faultlessness
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-10:
+  # Improve PostgreSQL replication documentation/runbooks (#1103) [...] Our guides need to state ...
+
+  experience: Backup procedures were insufficient
+  action: Many additional 'explaining key database operation' tasks
+  target: Database documentation and runbooks
+  goal: Improve database related operation tasks (during incident)
+
+  lifecycle: Response / Mitigation
+  action-type: evo / alter / strengthen
+  sts: Process / Maintenance procedures / Runbooks
+  google-ai: mitigate future
+  intended-effect: Interaction Capability / Operability
+  target-sts: process
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-11:
+  # Investigate pgbarman for creating PostgreSQL backups (#1105)
+
+  experience: After accidental data deletion, engineers found that some backups had been failing
+  action: Considering alternative disaster recovery tools
+  target: Database backup tooling and process (new possibility)
+  goal: Disaster recovery 
+
+  lifecycle: Response / Mitigation
+  action-type: 
+    - evo / add
+    - formative / discover options # investigate options
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-12:
+  # Investigate using WAL-E as a means of Database Backup and Realtime Replication (#494)
+
+  experience: After accidental data deletion, engineers found that some backups had been failing
+  action: Considering alternative disaster recovery tools
+  target: Database backup tooling and process (new possibility)
+  goal: Disaster recovery 
+
+  lifecycle: Response / Mitigation
+  action-type: 
+    - evo / add
+    - formative / discover options
+  sts: Tech / Support
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-13:
+  # Build Streaming Database Restore [... goal is] we have streaming backup, and we use this streaming backup to restore the database on a daily basis, effectively removing the pain of performing a restoration as it will become a standard procedure.
+
+  experience: After accidental data deletion, engineers found that some backups had been failing
+  action: Develop reliable streaming backup and restore
+  target: Database recovery process and tools (new possibility)
+  goal: Make restores a regular practice (and so more reliable)
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: Process / Disaster database recovery
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-14:
+  # Assign an owner for data durability
+
+  experience: After accidental data deletion, engineers found that some backups had been failing. Some data was lost permanently
+  action: Assign owner for neglected process and tooling
+  target: Database durability ownership
+  goal: Ensure someone is responsible for data durability
+
+  lifecycle: Response / Mitigation
+  action-type: evo / add
+  sts: People / Organization
+  google-ai: mitigate future
+  intended-effect: Reliability / Recoverability
+
+  matrix-influence: consequence
+  matrix-approach: capability
+
+AI-15:
+  # We are also working on setting up multiple secondaries and balancing the load amongst these hosts. 
+
+  experience: Primary DB was experiencing increased load which was why they were trying out a way to load balance queries
+  action: Add secondary databases and load balancing
+  target: Database cluster design (secondaries, pooling, ...)
+  goal: UNCLEAR
+
+  lifecycle: Failure / Inception
+  action-type: evo / add
+  sts: Tech / Core
+  google-ai: prevent
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+

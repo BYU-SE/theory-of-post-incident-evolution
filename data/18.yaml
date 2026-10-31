@@ -1,0 +1,106 @@
+#
+# 18.yaml | Slack
+# https://slack.engineering/slacks-outage-on-january-4th-2021/
+#
+# The first Monday when people return to work after the holidays caches are cold and traffic is high. High load (and slow network TGW auto-scaling by AWS) lead to high packet loss, some follow on failures (eg, the provisioning service) and finally an outage.
+#
+# [Context for all of the actions ...] Traffic is lower over the holidays, as everyone disconnects from work (good job on the work-life balance, Slack users!). On the first Monday back, client caches are cold and clients pull down more data than usual on their first connection to Slack. We go from our quietest time of the whole year to one of our biggest days quite literally overnight.
+
+AI-1:
+  # The AWS Transit Gateways (TGWs) are managed by AWS and are intended to scale transparently to us [however, Slack's traffic pattern is unusual and] our TGWs did not scale fast enough. During the incident, AWS engineers were alerted to our packet drops by their own internal monitoring, and increased our TGW capacity manually. AWS assures us that they are reviewing the AWS Transit Gateway (TGW) scaling algorithms for large packet-per-second increases as part of their post-incident process.
+
+  experience: AWS Transit Gateways did not scale fast enough when everyone came back to work (led to a different traffic pattern).
+  action: Third party will review scaling algorithm for specific case
+  target: Network gateways (AWS TGWs)
+  goal: Prevent overload during rapid packet increases
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / strengthen
+    - formative / check
+  sts: Tech / Infra
+  google-ai: prevent #/ trigger of incident
+  intended-effect: Flexibility / Scalability (behavior at steep spikes)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-2:
+  #  We use AWS Transit Gateways (TGWs) as hubs to link our VPCs [...] one of our Transit Gateways became overloaded [and] our TGWs did not scale fast enough [until AWS engineers were alerted] We’ve also set ourselves a reminder (a Slack reminder, of course) to request a preemptive upscaling of our TGWs at the end of the next holiday season.
+
+  experience: AWS Transit Gateways did not scale fast enough when everyone came back to work (led to a different traffic pattern).
+  action: Plan to preemptively request scaling up (seasonally)
+  target: Network gateways (AWS TGWs)
+  goal: Prevent overload during seasonal high-load events (predictable spike)
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / add # add human process
+    - formative / schedule
+  sts: Tech / Infra
+  google-ai: prevent #/ trigger of incident
+  intended-effect: Performance Efficiency / Capacity
+
+  matrix-influence: likelihood
+  matrix-approach: capability
+
+AI-3:
+  #  [Early in incident] our dashboarding and alerting service became unavailable [...] Our metrics backends were still up, meaning that we were able to query them directly [...] and investigation was now hampered by the lack of our usual dashboards and alerts [...] We make efforts to keep our monitoring tools as independent of Slack’s infrastructure as possible, so that they don’t fail us when we need them the most. In this case, our dashboard and alerting services failed because they were running in a different VPC from their backend databases, creating a dependency on the TGWs. Running the dashboard service instances in the same VPC as their database will remove this dependency.
+
+  experience: Dashboard/alerting services failed (but not metrics backend) during incident due to running the dashboard instances in a different VPC than the backend databases they depend on
+  action: Collocate service (dashboard) and dependency (database)
+  target: Dashboard & alerting system with database (with dependency on TGWs)
+  goal: Increase reliability by removing dependency (network gateway)
+
+  lifecycle:
+    - Response / Diagnosis
+    - Failure / Downstream Effects
+  action-type: evo / subtract # dependency on network
+  sts: Tech / Core
+  google-ai: mitigate future
+  intended-effect: Reliability / Fault tolerance (dependency)
+
+  matrix-influence: consequence 
+  matrix-approach: vulnerability 
+
+AI-4:
+  # The spike of load from the simultaneous provisioning of so many instances under suboptimal network conditions meant that provision-service hit two separate resource bottlenecks (the most significant one was the Linux open files limit, but we also exceeded an AWS quota limit) [...] Finally, we’ll make sure to regularly load test provision-service to make sure there aren’t any more scaling problems in store (we’ve load tested it in the past but this event exceeded our previous scale-ups).
+
+  experience: Provision service hit two separate bottlenecks under the spike of load and suboptimal network conditions
+  action: Add regular load testing for service (and at higher load)
+  target: Testing practices (provisioning service)
+  goal: Identify any additional scaling problems ("in extreme circumstances")
+
+  lifecycle: Failure / Downstream Effects
+    # 6.57am sort of ok ..
+    # 7am hourly traffic peak
+    # 7:01am PST and 7:15am PST
+  action-type: evo / add
+  sts: Process / Testing activities and practices # / Load testing
+  google-ai: prevent #/ identify similar vulnerabilities
+  intended-effect: Flexibility / Scalability (management)
+
+  matrix-influence: likelihood 
+  matrix-approach: capability 
+
+AI-5:
+  # The spike of load from the simultaneous provisioning of so many instances under suboptimal network conditions meant that provision-service hit two separate resource bottlenecks (the most significant one was the Linux open files limit, but we also exceeded an AWS quota limit) [...] We will also reevaluate our health-checking and autoscaling configurations to prevent inadvertently overloading provision-service again, even in extreme circumstances such as this significant network disruption.
+
+  experience: Provision service hit two separate bottlenecks under the spike of load and suboptimal network conditions
+  action: Reevaluate effects of health-check and autoscale configurations
+  target: Health checking and autoscaling configuration
+  goal: Prevent overloading service in extreme circumstances
+
+  lifecycle: Failure / Inception
+  action-type: 
+    - evo / alter / weaken
+    - formative / check
+  sts: Tech / Support
+  google-ai: prevent
+  intended-effect:
+    - Flexibility / Scalability (behavior at scale)
+    - Reliability / Faultlessness (well-behaved & prevent inadvertent overload)
+
+  matrix-influence: likelihood
+  matrix-approach: vulnerability 
+
